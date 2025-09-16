@@ -143,7 +143,7 @@ export const updateProgress = async (req, res) => {
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found" });
 
-    const enrolledStudent = course.studentsEnrolled.find(
+    const enrolledStudent = course.z.find(
       (s) => s.student.toString() === studentId
     );
 
