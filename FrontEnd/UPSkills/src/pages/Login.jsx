@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const Login = () => {
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +22,7 @@ const Login = () => {
     try {
       // Static Admin
       if (email === "testadmin1" && password === "admin@upskills") {
-        const res = await axios.post("http://localhost:5000/api/admin/login", {
+        const res = await axios.post(`${API_BASE}/api/admin/login`, {
           adminId: email,
           password,
         });
@@ -36,7 +37,7 @@ const Login = () => {
       }
 
       // Normal Users
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post(`${API_BASE}/api/auth/login`, {
         email,
         password,
       });

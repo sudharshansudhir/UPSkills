@@ -4,6 +4,8 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Footer from "../components/Footer";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const ResetPassword = () => {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ const ResetPassword = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        `http://localhost:5000/api/auth/reset-password/${token}`,
+        `${API_BASE}/api/auth/reset-password/${token}`,
         { password }
       );
 

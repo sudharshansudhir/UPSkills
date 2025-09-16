@@ -4,6 +4,8 @@ import lina from "../assets/lina.png";
 import axios from "axios";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const TopInstructor = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ const TopInstructor = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/courses");
+        const res = await axios.get(`${API_BASE}/api/courses`);
         setCourses(res.data);
         setLoading(false);
       } catch (err) {

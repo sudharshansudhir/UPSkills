@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEnvelope, FaPhoneAlt, FaVideo } from "react-icons/fa";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const StudentsList = () => {
   const [students, setStudents] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -11,7 +12,7 @@ const StudentsList = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/users?role=student");
+        const res = await axios.get(`${API_BASE}/api/users?role=student`);
         setStudents(res.data);
         setFiltered(res.data);
         setSelectedStudent(res.data[0] || null);

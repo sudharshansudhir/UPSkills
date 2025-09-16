@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import img2 from "../assets/register1.png";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
+
+  const API_BASE = import.meta.env.VITE_API_BASE;
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Register = () => {
@@ -43,7 +45,7 @@ const Register = () => {
         password: formData.password,
       };
 
-      const res = await axios.post("http://localhost:5000/api/auth/register", payload);
+      const res = await axios.post(`${API_BASE}/api/auth/register`, payload);
 
       // Backend returns message and user.isApproved
       const user = res.data.user;

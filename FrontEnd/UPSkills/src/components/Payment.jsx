@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Payment = () => {
     if (selectedCourses.length === 0 && courseId) {
       const fetchCourse = async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/courses/${courseId}`);
+          const res = await axios.get(`${API_BASE}/api/courses/${courseId}`);
           setSelectedCourses([res.data]);
         } catch (err) {
           console.error("Failed to fetch course:", err);
@@ -77,7 +78,7 @@ const Payment = () => {
       }
 
       const { data: order } = await axios.post(
-        "http://localhost:5000/api/payment/create-order",
+        `${API_BASE}/api/payment/create-order`,
         { amount: total },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -92,7 +93,7 @@ const Payment = () => {
         handler: async function (response) {
           try {
             await axios.post(
-              "http://localhost:5000/api/payment/verify",
+              `${API_BASE}/api/payment/verify`,
               {
                 orderId: order.id,
                 paymentId: response.razorpay_payment_id,
@@ -102,7 +103,7 @@ const Payment = () => {
             );
 
             await axios.post(
-              `http://localhost:5000/api/courses/${courseId}/enroll`,
+              `${API_BASE}/api/courses/${courseId}/enroll`,
               {},
               { headers: { Authorization: `Bearer ${token}` } }
             );

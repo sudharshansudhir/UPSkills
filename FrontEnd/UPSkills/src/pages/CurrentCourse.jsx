@@ -4,6 +4,8 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const CurrentCourse = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
@@ -12,7 +14,7 @@ const CurrentCourse = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/courses/${id}`);
+        const res = await axios.get(`${API_BASE}/api/courses/${id}`);
         setCourse(res.data);
       } catch (err) {
         console.error("Failed to fetch course", err);

@@ -13,6 +13,8 @@ import { NavLink, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import lina from "../assets/lina.png";
 
+const API_BASE = import.meta.env.VITE_SERVER_URL; // 👈 use env variable
+
 const CourseCard = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -33,29 +35,26 @@ const CourseCard = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/courses/${courseId}`
-        );
+        const res = await axios.get(`${API_BASE}/api/courses/${courseId}`);
         setCourseData(res.data);
 
         const reviewsRes = await axios.get(
-          `http://localhost:5000/api/courses/${courseId}/reviews`
+          `${API_BASE}/api/courses/${courseId}/reviews`
         );
         setLocalReviews(reviewsRes.data);
 
         const token = localStorage.getItem("token");
         if (token) {
-          const wishlistRes = await axios.get(
-            "http://localhost:5000/api/wishlist",
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          const wishlistRes = await axios.get(`${API_BASE}/api/wishlist`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const exists = wishlistRes.data.some(
             (c) => c.courseId === res.data._id
           );
           setInWishlist(exists);
 
           const enrolledRes = await axios.get(
-            "http://localhost:5000/api/courses/me/enrolled-courses",
+            `${API_BASE}/api/courses/me/enrolled-courses`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           const enrolled = enrolledRes.data.some(
@@ -86,7 +85,7 @@ const CourseCard = () => {
         return;
       }
       await axios.post(
-        "http://localhost:5000/api/wishlist",
+        `${API_BASE}/api/wishlist`,
         {
           courseId: courseData._id,
           title: courseData.title,
@@ -116,7 +115,7 @@ const CourseCard = () => {
       setSubmitting(true);
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        `http://localhost:5000/api/courses/${courseData._id}/reviews`,
+        `${API_BASE}/api/courses/${courseData._id}/reviews`,
         { rating, comment: feedback },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -149,35 +148,37 @@ const CourseCard = () => {
             </p>
           </div>
         );
-    case "ratings":
-  // Calculate average rating from reviews stored in DB
-  const reviews = courseData.reviews || [];
-  const averageRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
+      case "ratings":
+        const reviews = courseData.reviews || [];
+        const averageRating =
+          reviews.length > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            : 0;
 
-  return (
-    <div className="bg-[#e8f1fd] rounded-xl p-4 sm:p-6 space-y-4 mt-6 w-full">
-      <h3 className="text-lg sm:text-xl font-semibold">
-        {averageRating.toFixed(1)} out of 5
-      </h3>
-
-      {/* Stars based on average */}
-      <div className="flex items-center text-yellow-400 text-sm">
-        {[...Array(5)].map((_, i) => (
-          <FaStar
-            key={i}
-            className={i < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"}
-          />
-        ))}
-        <span className="ml-3 text-gray-600 font-medium">
-          {reviews.length > 0 ? `${reviews.length} reviews` : "No reviews yet"}
-        </span>
-      </div>
-    </div>
-  );
-
+        return (
+          <div className="bg-[#e8f1fd] rounded-xl p-4 sm:p-6 space-y-4 mt-6 w-full">
+            <h3 className="text-lg sm:text-xl font-semibold">
+              {averageRating.toFixed(1)} out of 5
+            </h3>
+            <div className="flex items-center text-yellow-400 text-sm">
+              {[...Array(5)].map((_, i) => (
+                <FaStar
+                  key={i}
+                  className={
+                    i < Math.round(averageRating)
+                      ? "text-yellow-400"
+                      : "text-gray-300"
+                  }
+                />
+              ))}
+              <span className="ml-3 text-gray-600 font-medium">
+                {reviews.length > 0
+                  ? `${reviews.length} reviews`
+                  : "No reviews yet"}
+              </span>
+            </div>
+          </div>
+        );
       case "reviews":
         return (
           <div className="space-y-4">
@@ -187,16 +188,10 @@ const CourseCard = () => {
                   key={idx}
                   className="bg-white p-4 rounded-xl border border-gray-200"
                 >
-                  {/* Reviewer Name */}
                   <p className="text-sm font-semibold text-gray-800">
-  {r.name || "Anonymous"}
-</p>
-
-
-                  {/* Comment */}
+                    {r.name || "Anonymous"}
+                  </p>
                   <p className="text-sm text-gray-600 mt-1">{r.comment}</p>
-
-                  {/* Stars */}
                   <div className="flex text-yellow-400 mt-1">
                     {[...Array(r.rating)].map((_, i) => (
                       <FaStar key={i} />
@@ -214,7 +209,7 @@ const CourseCard = () => {
           <div>
             <p className="text-gray-700 text-sm sm:text-base">
               {courseData.curriculum ||
-                "UPSkills LMS is an innovative learning management platform designed to help students build real-world skills through engaging, practical, and industry-relevant courses. Unlike traditional learning, UPSkills offers an interactive and flexible environment where students can access high-quality video lectures, quizzes, and assignments anytime, anywhere. The platform is built to foster collaboration and growth with features like live sessions, doubt-solving, and peer interaction, ensuring that every learner stays motivated and supported. With a wide range of courses in technology, design, business, and more, students not only gain knowledge but also receive certifications that add value to their careers. UPSkills bridges the gap between academic learning and professional success, empowering learners to upgrade themselves continuously and stay ahead in today’s competitive world."}
+                "UPSkills LMS is an innovative learning management platform..."}
             </p>
           </div>
         );
@@ -222,6 +217,7 @@ const CourseCard = () => {
         return null;
     }
   };
+
 
   return (
     <div className="w-full">

@@ -7,6 +7,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FaBell, FaTimes } from 'react-icons/fa';
 import axios from "axios";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const dummyNotifications = [
   { msg: "New Course Uploaded from Instructor 1" },
   { msg: "New task updated for Course 3" },
@@ -35,7 +37,7 @@ const Navbar = () => {
           return;
         }
 
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userData = res.data;
@@ -45,7 +47,7 @@ const Navbar = () => {
         setRole(userData.role || "student");
 
         // ✅ Fetch notifications
-        const notifRes = await axios.get("http://localhost:5000/api/notifications/my", {
+        const notifRes = await axios.get(`${API_BASE}/api/notifications/my`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setNotifications(notifRes.data);

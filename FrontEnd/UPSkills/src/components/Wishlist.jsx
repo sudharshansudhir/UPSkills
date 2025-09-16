@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
 
@@ -9,7 +11,7 @@ const Wishlist = () => {
     const fetchWishlist = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/wishlist", {
+        const res = await axios.get(`${API_BASE}/api/wishlist`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setWishlist(res.data);
@@ -23,7 +25,7 @@ const Wishlist = () => {
   const handleRemove = async (courseId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`http://localhost:5000/api/wishlist/${courseId}`, {
+      const res = await axios.delete(`${API_BASE}/api/wishlist/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWishlist(res.data);

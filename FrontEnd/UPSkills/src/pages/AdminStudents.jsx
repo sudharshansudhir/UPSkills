@@ -4,6 +4,8 @@ import logo from '../assets/UPSkills-whitelogo.png';
 import { NavLink } from 'react-router-dom';
 import Footer from '../components/Footer';
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -14,7 +16,7 @@ const AdminStudents = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/users?role=student');
+        const res = await axios.get('${API_BASE}/api/users?role=student');
         setStudents(res.data);
         setSelected(res.data[0] || null);
       } catch (err) {
@@ -59,7 +61,7 @@ const AdminStudents = () => {
 
     try {
       const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://localhost:5000/api/admin/users/${studentId}`, {
+      await axios.delete(`${API_BASE}/api/admin/users/${studentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

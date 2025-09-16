@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Welcome = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ const Welcome = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          "http://localhost:5000/api/courses/me/enrolled-courses",
+          `${API_BASE}/api/courses/me/enrolled-courses`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCourses(res.data);

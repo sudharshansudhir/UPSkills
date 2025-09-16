@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const QuizPage = () => {
   const navigate = useNavigate();
   const { id: courseId } = useParams(); 
@@ -14,7 +16,7 @@ const QuizPage = () => {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/courses/${courseId}`);
+        const res = await axios.get(`${API_BASE}/api/courses/${courseId}`);
         const courseQuizzes = res.data.quizzes || [];
 
         const allQuestions = courseQuizzes.flatMap((q) =>

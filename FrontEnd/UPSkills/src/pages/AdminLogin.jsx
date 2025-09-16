@@ -5,6 +5,7 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";  // 👈 Import icons
 import Footer from '../components/Footer';
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const AdminLogin = () => {
   const [adminId, setAdminId] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +30,7 @@ const handleLogin = async (e) => {
   if (!validateForm()) return;
 
   try {
-    const res = await axios.post("http://localhost:5000/api/admin/admin-login", {
+    const res = await axios.post(`${API_BASE}/api/admin/admin-login`, {
       adminId,
       password,
     });

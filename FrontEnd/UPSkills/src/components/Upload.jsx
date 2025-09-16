@@ -3,6 +3,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const Upload = () => {
   const navigate = useNavigate();
 
@@ -53,7 +54,7 @@ const Upload = () => {
       setUploading(true);
       setUploadProgress(0);
 
-      const res = await axios.post("http://localhost:5000/api/courses/upload/video", fd, {
+      const res = await axios.post(`${API_BASE}/api/courses/upload/video`, fd, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -120,7 +121,7 @@ const Upload = () => {
         quizzes,
       };
 
-      await axios.post("http://localhost:5000/api/courses", finalData, {
+      await axios.post(`${API_BASE}/api/courses`, finalData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

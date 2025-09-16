@@ -4,6 +4,8 @@ import Instructorfooter from "../components/Footer";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Instructordashboard = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ const Instructordashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "http://localhost:5000/api/courses/instructor/my-courses", // ✅ correct
+        `${API_BASE}/api/courses/instructor/my-courses`, // ✅ correct
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -34,7 +36,7 @@ const handleDelete = async (courseId) => {
   if (window.confirm("Are you sure you want to delete this course?")) {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/courses/${courseId}`, {
+      await axios.delete(`${API_BASE}/api/courses/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       // update state

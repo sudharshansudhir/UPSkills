@@ -4,6 +4,7 @@ import logo from '../assets/UPSkills-whitelogo.png';
 import { NavLink } from 'react-router-dom';
 import Footer from '../components/Footer';
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const AdminInstructors = () => {
   const [instructors, setInstructors] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -16,7 +17,7 @@ const AdminInstructors = () => {
   useEffect(() => {
     const fetchInstructors = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/users', {
+        const res = await axios.get('${API_BASE}/api/admin/users', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -64,7 +65,7 @@ const AdminInstructors = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+      await axios.delete(`${API_BASE}/api/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setInstructors(prev => prev.filter(ins => ins._id !== id));
@@ -145,7 +146,7 @@ const AdminInstructors = () => {
                   onClick={async () => {
                     if (!window.confirm('Approve this instructor? ✅')) return;
                     try {
-                      await axios.put(`http://localhost:5000/api/admin/approve-instructor/${selected._id}`, {}, {
+                      await axios.put(`${API_BASE}/api/admin/approve-instructor/${selected._id}`, {}, {
                         headers: { Authorization: `Bearer ${token}` },
                       });
                       alert('Instructor approved ✅');
@@ -162,7 +163,7 @@ const AdminInstructors = () => {
                   onClick={async () => {
                     if (!window.confirm('Decline and delete this instructor? ❌')) return;
                     try {
-                      await axios.delete(`http://localhost:5000/api/admin/decline-instructor/${selected._id}`, {
+                      await axios.delete(`${API_BASE}/api/admin/decline-instructor/${selected._id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                       });
                       setInstructors(prev => prev.filter(ins => ins._id !== selected._id));

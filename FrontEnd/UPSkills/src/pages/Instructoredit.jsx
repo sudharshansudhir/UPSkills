@@ -5,6 +5,8 @@ import axios from "axios";
 import Footer from "../components/Footer";
 import Instructornavbar from "../components/Instructornavbar";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Instructoredit = () => {
   const navigate = useNavigate();
   const { id: courseId } = useParams();
@@ -25,7 +27,7 @@ const Instructoredit = () => {
     const fetchCourse = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:5000/api/courses/${courseId}`, {
+        const res = await axios.get(`${API_BASE}/api/courses/${courseId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -76,7 +78,7 @@ const Instructoredit = () => {
       setUploadProgress(0);
 
       const res = await axios.post(
-        "http://localhost:5000/api/courses/upload/video",
+        `${API_BASE}/api/courses/upload/video`,
         fd,
         {
           headers: {
@@ -116,7 +118,7 @@ const Instructoredit = () => {
       });
 
       await axios.patch(
-        `http://localhost:5000/api/courses/${courseId}`,
+        `${API_BASE}/api/courses/${courseId}`,
         changedFields,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -217,14 +219,14 @@ const Instructoredit = () => {
     if (editingQuizId && editingQuizId !== "new") {
       // ✅ Edit existing quiz
       res = await axios.put(
-        `http://localhost:5000/api/courses/${courseId}/quiz/${editingQuizId}`,
+        `${API_BASE}/api/courses/${courseId}/quiz/${editingQuizId}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
     } else {
       // ✅ Add new quiz
       res = await axios.post(
-        `http://localhost:5000/api/courses/${courseId}/quiz`,
+        `${API_BASE}/api/courses/${courseId}/quiz`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -234,7 +236,7 @@ const Instructoredit = () => {
 
     // ✅ Fetch fresh quizzes from backend
     const updated = await axios.get(
-      `http://localhost:5000/api/courses/${courseId}`,
+      `${API_BASE}/api/courses/${courseId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setQuizzes(updated.data.quizzes || []);

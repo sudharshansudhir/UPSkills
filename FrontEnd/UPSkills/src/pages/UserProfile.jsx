@@ -6,6 +6,8 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import axios from "axios";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 import {
   BarChart,
   Bar,
@@ -41,7 +43,7 @@ const UserProfile = ({ role = "student" }) => {
           return;
         }
 
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -113,7 +115,7 @@ const UserProfile = ({ role = "student" }) => {
       const updatedUser = { ...draftUser, badges };
 
       const res = await axios.put(
-        "http://localhost:5000/api/auth/me",
+        `${API_BASE}/api/auth/me`,
         updatedUser,
         { headers: { Authorization: `Bearer ${token}` } }
       );

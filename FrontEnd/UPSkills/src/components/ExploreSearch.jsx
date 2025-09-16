@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import axios from "axios";
 import bgimg from "../assets/CourseDetails.png";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const ExploreSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -12,10 +12,11 @@ const ExploreSearch = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/courses");
+        const res = await axios.get(`${API_BASE}/api/courses`);
         setCourses(res.data);
       } catch (err) {
         console.error("Error fetching courses:", err);

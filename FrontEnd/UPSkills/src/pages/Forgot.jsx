@@ -3,6 +3,7 @@ import img1 from "../assets/login1.png";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const Forgot = () => {
   const [email, setEmail] = useState("");
 
@@ -14,7 +15,7 @@ const Forgot = () => {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/forgot-password", {
+      const res = await axios.post(`${API_BASE}/api/auth/forgot-password`, {
         email,
       });
 

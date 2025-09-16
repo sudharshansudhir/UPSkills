@@ -5,6 +5,8 @@ import { FaTachometerAlt, FaChalkboardTeacher, FaUserGraduate, FaMoneyBillWave }
 import { NavLink, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
 const AdminDashboard = () => {
   const [usersAnalytics, setUsersAnalytics] = useState(null);
   const [latestInstructors, setLatestInstructors] = useState([]);
@@ -25,9 +27,9 @@ const AdminDashboard = () => {
 
         const [usersAnalyticsRes, latestInstructorsRes, latestStudentsRes] =
           await Promise.all([
-            axios.get("http://localhost:5000/api/admin/analytics/users", { headers }),
-            axios.get("http://localhost:5000/api/admin/latest-instructors", { headers }),
-            axios.get("http://localhost:5000/api/admin/latest-students", { headers }),
+            axios.get(`${API_BASE}/api/admin/analytics/users`, { headers }),
+            axios.get(`${API_BASE}/api/admin/latest-instructors`, { headers }),
+            axios.get(`${API_BASE}/api/admin/latest-students`, { headers }),
           ]);
 
         setUsersAnalytics(usersAnalyticsRes.data);

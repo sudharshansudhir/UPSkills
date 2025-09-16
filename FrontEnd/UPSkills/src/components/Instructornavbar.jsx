@@ -4,6 +4,7 @@ import logo from "../assets/UPSkills-logo (3).png";
 import lina from "../assets/lina.png";
 import { FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
 import axios from "axios";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const Instructornavbar = () => {
   const [profile, setProfile] = useState({ name: "Instructor", profileImage: lina });
@@ -19,7 +20,7 @@ const Instructornavbar = () => {
           return;
         }
 
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
