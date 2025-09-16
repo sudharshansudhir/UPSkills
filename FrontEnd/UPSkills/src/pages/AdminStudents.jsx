@@ -16,7 +16,7 @@ const AdminStudents = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('${API_BASE}/api/users?role=student');
+        const res = await axios.get(`${API_BASE}/api/users?role=student`);
         setStudents(res.data);
         setSelected(res.data[0] || null);
       } catch (err) {

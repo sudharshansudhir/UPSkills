@@ -17,7 +17,7 @@ const AdminInstructors = () => {
   useEffect(() => {
     const fetchInstructors = async () => {
       try {
-        const res = await axios.get('${API_BASE}/api/admin/users', {
+        const res = await axios.get(`${API_BASE}/api/admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
