@@ -10,7 +10,8 @@ import {
   deleteCourse,
   adminLogin,
   getLatestStudents,
-  getLatestInstructors
+  getLatestInstructors,
+  getStats
 } from "../controllers/adminController.js";
 
 import { protect, authorize } from "../middleware/authMiddleware.js";
@@ -26,6 +27,7 @@ router.get("/users", protect, authorize("admin"), getAllUsers);
 router.get("/courses", protect, authorize("admin"), getAllCourses);
 router.delete("/users/:id", protect, authorize("admin"), deleteUser);
 router.delete("/courses/:id", protect, authorize("admin"), deleteCourse);
+router.get("/stats", getStats);
 
 router.put("/approve-instructor/:id", protect, authorize("admin"), approveInstructor);
 router.delete("/decline-instructor/:id", protect, authorize("admin"), declineInstructor);

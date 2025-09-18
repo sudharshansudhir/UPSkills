@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import logo from "../assets/UPSkills-whitelogo.png";
-import { FaTachometerAlt, FaChalkboardTeacher, FaUserGraduate, FaMoneyBillWave } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  LineChart,
+  Line,
+} from "recharts"; // ✅ recharts import
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const AdminDashboard = () => {
   const [usersAnalytics, setUsersAnalytics] = useState(null);
@@ -58,6 +72,15 @@ const AdminDashboard = () => {
 
   if (loading) return <div className="p-6">⏳ Loading admin dashboard...</div>;
 
+  // ✅ Prepare data for charts
+  const chartData = [
+    { name: "Students", value: usersAnalytics?.students ?? 0 },
+    { name: "Instructors", value: usersAnalytics?.instructors ?? 0 },
+    { name: "Courses", value: usersAnalytics?.courses ?? 0 },
+  ];
+
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -75,9 +98,6 @@ const AdminDashboard = () => {
           <NavLink to="/admin-students" className="flex items-center gap-2 px-4 py-2 hover:bg-[#1a3261] rounded-md">
             🧑‍🎓 Students
           </NavLink>
-          {/* <NavLink to="/admin-transactions" className="flex items-center gap-2 px-4 py-2 hover:bg-[#1a3261] rounded-md">
-            <FaMoneyBillWave /> Transactions
-          </NavLink> */}
         </nav>
       </div>
 
@@ -103,6 +123,68 @@ const AdminDashboard = () => {
             <EmojiStatCard icon="🎓" title="Students" value={usersAnalytics?.students ?? 0} color="bg-green-100" />
             <EmojiStatCard icon="👩‍🏫" title="Instructors" value={usersAnalytics?.instructors ?? 0} color="bg-purple-100" />
             <EmojiStatCard icon="⏳" title="Pending Instructors" value={usersAnalytics?.pendingInstructors ?? 0} color="bg-yellow-100" />
+          </div>
+
+          {/* ✅ Statistics Graphs Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            {/* Bar Chart */}
+            <div className="bg-white border rounded-lg p-4 md:p-6 shadow">
+              <h3 className="font-semibold mb-4">📈 Bar Chart Overview</h3>
+              <div className="w-full h-72">
+                <ResponsiveContainer>
+                  <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#2ec4b6" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Pie Chart */}
+            <div className="bg-white border rounded-lg p-4 md:p-6 shadow">
+              <h3 className="font-semibold mb-4">🥧 Pie Chart Overview</h3>
+              <div className="w-full h-72">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Line Chart */}
+            <div className="bg-white border rounded-lg p-4 md:p-6 shadow lg:col-span-2">
+              <h3 className="font-semibold mb-4">📉 Line Chart Overview</h3>
+              <div className="w-full h-72">
+                <ResponsiveContainer>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="value" stroke="#ff7300" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
 
           {/* Latest Users Section */}

@@ -6,8 +6,9 @@ import userImg from "../assets/lina.png";
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FaBell, FaTimes } from 'react-icons/fa';
 import axios from "axios";
+import { useAuth } from "../context/AuthContext.jsx";  // ✅ use context
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const dummyNotifications = [
   { msg: "New Course Uploaded from Instructor 1" },
@@ -18,33 +19,20 @@ const dummyNotifications = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState(dummyNotifications);
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("User");
-  const [role, setRole] = useState("student");
 
   const navigate = useNavigate();
+  const { user, logout } = useAuth();   // ✅ from context
 
   useEffect(() => {
     const fetchUserAndNotifs = async () => {
       try {
+        if (!user) return; // user null na skip
+
         const token = localStorage.getItem("token");
-        if (!token) {
-          setIsLoggedIn(false);
-          setLoading(false);
-          return;
-        }
-
-        const res = await axios.get(`${API_BASE}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const userData = res.data;
-
-        setIsLoggedIn(true);
-        setUsername(userData.name || "User");
-        setRole(userData.role || "student");
+        if (!token) return;
 
         // ✅ Fetch notifications
         const notifRes = await axios.get(`${API_BASE}/api/notifications/my`, {
@@ -53,21 +41,13 @@ const Navbar = () => {
         setNotifications(notifRes.data);
       } catch (err) {
         console.error("Navbar user fetch failed:", err);
-        setIsLoggedIn(false);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserAndNotifs();
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token"); 
-    setIsLoggedIn(false);
-    setUsername("User");
-    navigate("/login");
-  };
+  }, [user]);
 
   return (
     <>
@@ -79,24 +59,23 @@ const Navbar = () => {
             <div className="flex gap-10 lg:gap-20 items-center">
               <div className="flex gap-6 lg:gap-10 items-center text-sm lg:text-base">
                 <NavLink to="/" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Home</NavLink>
-                {isLoggedIn && role === "student" && (
+                {user && user.role === "student" && (
                   <>
                     <NavLink to="/courses" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Courses</NavLink>
                     <NavLink to="/explore" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Explore</NavLink>
                     <NavLink to="/wishlist" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>MyWishlist</NavLink>
                   </>
                 )}
-                {isLoggedIn && role === "instructor" && (
+                {user && user.role === "instructor" && (
                   <>
                     <NavLink to="/instructor-students" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>MyStudents</NavLink>
-                    
                     <NavLink to="/instructor-dashboard" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>MyCourses</NavLink>
                   </>
                 )}
               </div>
 
               <div className="flex items-center gap-4">
-                {isLoggedIn ? (
+                {user ? (
                   <>
                     {/* 🔔 Bell with only count */}
                     <button onClick={() => setShowNotifications(true)} className="relative">
@@ -112,13 +91,13 @@ const Navbar = () => {
                     <div className="flex items-center gap-3">
                       <div 
                         className="flex items-center gap-2 cursor-pointer"
-                        onClick={() => navigate(role === "instructor" ? "/profile-instructor" : "/profile")}
+                        onClick={() => navigate(user.role === "instructor" ? "/profile-instructor" : "/profile")}
                       >
                         <img src={userImg} alt="user" className="h-8 w-8 rounded-full object-cover" />
-                        <span className="font-medium text-sm lg:text-base">{username} ▼</span>
+                        <span className="font-medium text-sm lg:text-base">{user.name} ▼</span>
                       </div>
                       <button 
-                        onClick={handleLogout} 
+                        onClick={logout} 
                         className="px-3 lg:px-4 py-1 bg-red-500 text-white rounded-md text-xs lg:text-sm"
                       >
                         Logout
@@ -137,7 +116,7 @@ const Navbar = () => {
         </div>
 
         {/* ✅ Notification Slide Panel */}
-        {isLoggedIn && (
+        {user && (
           <div
             className={`fixed top-0 right-0 w-72 sm:w-80 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
               showNotifications ? 'translate-x-0' : 'translate-x-full'
@@ -169,7 +148,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navbar */}
-      <div className="min-h-[90px] block md:hidden bg-cover bg-no-repeat" style={{ backgroundImage: isLoggedIn ? 'none' : `url(${mob_bg})` }}>
+      <div className="min-h-[90px] block md:hidden bg-cover bg-no-repeat" style={{ backgroundImage: user ? 'none' : `url(${mob_bg})` }}>
         <div className="px-4 sm:px-6 py-2 flex justify-between items-center bg-white shadow-sm">
           <img src={logo2} alt="logo" className="h-14" />
           <button onClick={() => setIsOpen(!isOpen)}>
@@ -194,7 +173,7 @@ const Navbar = () => {
               Home
             </NavLink>
 
-            {isLoggedIn && role === "student" && (
+            {user && user.role === "student" && (
               <>
                 <NavLink to="/courses" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>Courses</NavLink>
                 <NavLink to="/explore" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>Explore</NavLink>
@@ -202,28 +181,27 @@ const Navbar = () => {
               </>
             )}
 
-            {isLoggedIn && role === "instructor" && (
+            {user && user.role === "instructor" && (
               <>
                 <NavLink to="/instructor-students" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>MyStudents</NavLink>
-                
                 <NavLink to="/instructor-dashboard" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>MyCourses</NavLink>
               </>
             )}
 
             <div className="pt-6 flex flex-col gap-3">
-              {isLoggedIn ? (
+              {user ? (
                 <>
                   <div 
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={() => {
                       setIsOpen(false);
-                      navigate(role === "instructor" ? "/profile-instructor" : "/profile");
+                      navigate(user.role === "instructor" ? "/profile-instructor" : "/profile");
                     }}
                   >
                     <img src={userImg} className="h-8 w-8 rounded-full" alt="User" />
-                    <span className="font-medium">{username} ▼</span>
+                    <span className="font-medium">{user.name} ▼</span>
                   </div>
-                  <button onClick={handleLogout} className="mt-2 text-red-500 text-sm font-medium text-left">Logout</button>
+                  <button onClick={logout} className="mt-2 text-red-500 text-sm font-medium text-left">Logout</button>
                 </>
               ) : (
                 <>

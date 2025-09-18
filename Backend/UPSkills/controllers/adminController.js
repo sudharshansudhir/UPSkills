@@ -70,6 +70,21 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+export const getStats = async (req, res) => {
+  try {
+    const students = await User.countDocuments({ role: "student" });
+    const instructors = await User.countDocuments({ role: "instructor" });
+    const courses = await Course.countDocuments();
+
+    res.json({
+      students,
+      instructors,
+      courses
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching stats", error: err.message });
+  }
+};
 
 // Delete a course
 export const deleteCourse = async (req, res) => {
@@ -87,11 +102,18 @@ export const getUsersAnalytics = async (req, res) => {
     const totalUsers = await User.countDocuments();
     const students = await User.countDocuments({ role: "student" });
     const instructors = await User.countDocuments({ role: "instructor" });
-    const admins = await User.countDocuments({ role: "admin" });
+    const pendingInstructors = await User.countDocuments({ role: "instructor", status: "pending" });
+    const courses = await Course.countDocuments();   // ✅ new line
 
-    res.json({ totalUsers, students, instructors, admins });
+    res.json({
+      totalUsers,
+      students,
+      instructors,
+      pendingInstructors,
+      courses,   // ✅ include in response
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Error fetching analytics", error: err.message });
   }
 };
 

@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import axios from "axios";   // ✅ axios import
 
 import { AuthProvider } from "./context/AuthContext.jsx"   // ✅ add this
 
@@ -32,6 +33,12 @@ import CurrentCourse from './pages/CurrentCourse.jsx'
 import Forgot from './pages/Forgot.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import App from './App.jsx'
+
+// ✅ App start aagumbodhu localStorage la token irundha auto attach aagum
+const token = localStorage.getItem("token");
+if (token) {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
 
 const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },

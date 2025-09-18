@@ -1,12 +1,10 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
-import { fileURLToPath } from "url";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
 import {
   addReview,
-  getCourseReviews
-} from "../controllers/courseController.js";
-import {
+  getCourseReviews,
   createCourse,
   getInstructorCourses,
   getCourseById,
@@ -14,18 +12,10 @@ import {
   deleteCourse,
   getAllCourses,
   getEnrolledStudents,
-  updateQuiz
+  updateQuiz,
+  addQuiz
 } from "../controllers/courseController.js";
 import { protect, isInstructor } from "../middleware/authMiddleware.js";
-import { uploadVideoFile } from "../controllers/uploadController.js";
-import { getMyEnrolledCourses } from "../controllers/enrollmentController.js";
-import { addQuiz } from "../controllers/courseController.js";
-// ...
-
-// import { enrollStudent } from "../controllers/enrollmentController.js";
-
-// router.post("/:id/enroll", protect, enrollStudent);
-
 import {
   enrollStudent,
   getCurrentCourse,
@@ -34,46 +24,53 @@ import {
 
 const router = express.Router();
 
-// multer config
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../uploads/videos")); 
+// ✅ Cloudinary Storage for Videos
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "upskills/videos",       // folder in Cloudinary
+    resource_type: "video",          // important for mp4/webm
+    public_id: (req, file) => Date.now() + "-" + file.originalname.replace(/\s+/g, "-"),
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const safeName = file.originalname.replace(/\s+/g, "-");
-    cb(null, `${uniqueSuffix}-${safeName}`);
-  }
-});
-const upload = multer({
-  storage,
-  limits: { fileSize: 200 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("video/")) cb(null, true);
-    else cb(new Error("Only video files are allowed"), false);
-  }
 });
 
-// Upload raw video
-router.post("/upload/video", protect, isInstructor, upload.single("video"), uploadVideoFile);
+const upload = multer({ storage });
+
+// ✅ Upload video route
+router.post(
+  "/upload/video",
+  protect,
+  isInstructor,
+  upload.single("video"),
+  (req, res) => {
+    try {
+      // Cloudinary automatically gives secure URL
+      res.json({ url: req.file.path });
+    } catch (err) {
+      console.error("Upload error:", err);
+      res.status(500).json({ message: "Video upload failed" });
+    }
+  }
+);
 
 // Enrollment
-// router.post("/", protect, createCourse);
-
 router.post("/:id/enroll", protect, enrollStudent);
 router.get("/me/current-course", protect, getCurrentCourse);
 router.get("/:id/students", protect, isInstructor, getCourseStudents);
-router.get("/me/enrolled-courses", protect, getMyEnrolledCourses);
-router.post("/:id/quiz",protect, isInstructor, addQuiz);
+router.get("/me/enrolled-courses", protect, getEnrolledStudents);
+router.post("/:id/quiz", protect, isInstructor, addQuiz);
 router.put("/:id/quiz/:quizId", protect, isInstructor, updateQuiz);
+
+// Course CRUD
 router.post("/", protect, createCourse);
 router.get("/instructor/my-courses", protect, getInstructorCourses);
 router.get("/:id", getCourseById);
 router.patch("/:id", protect, updateCourse);
 router.delete("/:id", protect, deleteCourse);
 router.get("/", getAllCourses);
+
+// Reviews
 router.post("/:id/reviews", protect, addReview);
 router.get("/:id/reviews", getCourseReviews);
+
 export default router;

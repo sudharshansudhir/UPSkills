@@ -5,6 +5,7 @@ import Features from '../components/Features'
 import Testimonial from '../components/Testimonial'
 import Creators from '../components/Creators'
 import Footer from '../components/Footer'
+import RemoteLearning from '../components/RemoteLearning'
 
 const HomePage = () => {
   return (
@@ -13,8 +14,9 @@ const HomePage = () => {
             <Navbar/>
             <AboutSection/>
             <Features/>
+            <RemoteLearning/>
             <Testimonial/>
-            <Creators/>
+            {/* <Creators/> */}
             <Footer/>
         </div>
     </div>

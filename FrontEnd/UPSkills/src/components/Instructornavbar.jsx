@@ -59,7 +59,7 @@ const Instructornavbar = () => {
           to="/instructor-students"
           className={({ isActive }) =>
             isActive
-              ? "text-black underline"
+              ? "text-teal-600 text-lg"
               : "text-gray-600 hover:text-black"
           }
         >
@@ -70,7 +70,7 @@ const Instructornavbar = () => {
           to="/instructor-dashboard"
           className={({ isActive }) =>
             isActive
-              ? "text-teal-500 font-semibold underline"
+              ? "text-teal-600 text-lg"
               : "text-gray-600 hover:text-black"
           }
         >

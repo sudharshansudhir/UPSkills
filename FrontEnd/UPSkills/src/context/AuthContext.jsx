@@ -1,35 +1,30 @@
-import { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import { createContext, useContext, useState } from "react";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  });
 
-  // Fetch full user profile from backend
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const res = await axios.get("/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(res.data.user); // full info
-      localStorage.setItem("userProfile", JSON.stringify(res.data.user)); // optional
-    } catch (error) {
-      console.log("Fetch user error:", error);
-    }
+  const login = (userData, token) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("token", token);
+    setUser(userData);
   };
 
-  // Fetch user on page load if token exists
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  const logout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, fetchUser }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);

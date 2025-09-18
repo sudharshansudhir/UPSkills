@@ -1,21 +1,23 @@
+@import "tailwindcss";
 *{
   font-family: "Poppins";
   font-weight: 400;
   font-style: normal;
 }
-@import "tailwindcss";
+
 
 .active{
-  text-decoration: underline;
-  color:black
+  /* text-decoration: underline; */
+  color:#000000
 }
 
 .not{
   color: black;
 }
 .active_l{
-  text-decoration: underline;
-  color:black
+  /* text-decoration: underline; */
+  color:rgb(22, 197, 174);
+  font-size: 20px;
 }
 
 .not_l{

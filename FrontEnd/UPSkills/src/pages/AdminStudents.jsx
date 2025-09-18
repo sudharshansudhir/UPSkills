@@ -84,7 +84,8 @@ const AdminStudents = () => {
         <nav className="flex flex-col gap-2">
           <NavLink to="/admindashboard" className="hover:bg-[#1a2a50] px-4 py-2 rounded">🏠 Dashboard</NavLink>
           <NavLink to="/admin-instructors" className="hover:bg-[#1a2a50] px-4 py-2 rounded">👩‍🏫 Instructors</NavLink>
-          <NavLink to="/adminstudents" className="bg-[#16c9c6] px-4 py-2 rounded">🧑‍🎓 Students</NavLink>
+          <NavLink to="/admin-students" className="bg-[#16c9c6] px-4 py-2 rounded">🧑‍🎓 Students</NavLink>
+          
           {/* <NavLink to="/admin-transactions" className="hover:bg-[#1a2a50] px-4 py-2 rounded">💸 Transactions</NavLink> */}
         </nav>
       </div>

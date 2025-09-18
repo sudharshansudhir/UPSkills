@@ -3,13 +3,16 @@ import img1 from '../assets/login1.png';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext.jsx";  // ✅ use context
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();   // ✅ from context
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -42,7 +45,8 @@ const Login = () => {
         password,
       });
 
-      localStorage.setItem("token", res.data.token);
+      // ✅ save via context
+      login(res.data.user, res.data.token);
 
       alert("Login Successful ✅");
 
@@ -130,14 +134,14 @@ const Login = () => {
               </button>
             </div>
 
-<div className="text-right mt-2">
-  <NavLink
-    to="/forgotpassword"
-    className="text-sm text-[#2ec4b6] hover:underline"
-  >
-    Forgot Password?
-  </NavLink>
-</div>
+            <div className="text-right mt-2">
+              <NavLink
+                to="/forgotpassword"
+                className="text-sm text-[#2ec4b6] hover:underline"
+              >
+                Forgot Password?
+              </NavLink>
+            </div>
             <button
               type="submit"
               className="w-full py-2 sm:py-3 mt-4 rounded-full bg-[#2ec4b6] text-white font-medium text-sm sm:text-base hover:bg-[#27b2a6] transition"
