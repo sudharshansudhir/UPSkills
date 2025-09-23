@@ -240,7 +240,7 @@ const formatRelativeDateTime = (dateString) => {
                     <img src={userImg} className="h-8 w-8 rounded-full" alt="User" />
                     <span className="font-medium">{user.name} ▼</span>
                   </div>
-                  <button onClick={logout} className="mt-2 text-red-500 text-sm font-medium text-left">Logout</button>
+                  <NavLink to="/login" onClick={logout} className="mt-2 text-red-500 text-sm font-medium text-left">Logout</NavLink>
                 </>
               ) : (
                 <>
