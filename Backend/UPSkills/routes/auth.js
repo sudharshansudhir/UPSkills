@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser, getMe, updateUser } from "../controllers/authController.js";
+import { registerUser, loginUser, getMe, updateUser, sendOtp, resetPasswordWithOtp } from "../controllers/authController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { forgotPassword } from "../controllers/authController.js";
 import { resetPassword } from "../controllers/authController.js"; // JWT check middleware
@@ -16,4 +16,8 @@ router.post("/forgot-password", forgotPassword);
 
 // ✅ Reset Password
 router.post("/reset-password/:token", resetPassword);
+
+router.post("/send-otp", sendOtp);
+router.post("/reset-password-otp", resetPasswordWithOtp);
+
 export default router;

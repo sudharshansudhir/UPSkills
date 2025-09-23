@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2"; // ✅ SweetAlert2
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -63,9 +65,21 @@ const Payment = () => {
     if (validCoupons[code]) {
       setDiscount(validCoupons[code]);
       setCouponMsg(`✅ Coupon applied! You got ${validCoupons[code]}% off.`);
+      Swal.fire({
+        icon: "success",
+        title: "Coupon Applied 🎉",
+        text: `You got ${validCoupons[code]}% off.`,
+        confirmButtonColor: "#2ec4b6",
+      });
     } else {
       setDiscount(0);
       setCouponMsg("❌ Invalid coupon code.");
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Coupon ❌",
+        text: "Please try again with a valid coupon.",
+        confirmButtonColor: "#2ec4b6",
+      });
     }
   };
 
@@ -73,7 +87,12 @@ const Payment = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("⚠️ Please login first");
+        Swal.fire({
+          icon: "warning",
+          title: "Login Required ⚠️",
+          text: "Please login first to continue with payment.",
+          confirmButtonColor: "#2ec4b6",
+        });
         return;
       }
 
@@ -108,11 +127,20 @@ const Payment = () => {
               { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            alert("✅ Payment Successful & Course Enrolled!");
-            navigate(`/currentcourse/${courseId}`);
+            Swal.fire({
+              icon: "success",
+              title: "Payment Successful ✅",
+              text: "You have been enrolled in the course.",
+              confirmButtonColor: "#2ec4b6",
+            }).then(() => navigate(`/currentcourse/${courseId}`));
           } catch (err) {
             console.error("❌ Error during enrollment:", err);
-            alert("❌ Payment Verification or Enrollment Failed");
+            Swal.fire({
+              icon: "error",
+              title: "Enrollment Failed ❌",
+              text: "Payment verification or enrollment failed.",
+              confirmButtonColor: "#2ec4b6",
+            });
           }
         },
         prefill: {
@@ -127,7 +155,12 @@ const Payment = () => {
       rzp1.open();
     } catch (err) {
       console.error("❌ Payment failed:", err);
-      alert("❌ Payment failed! Try again.");
+      Swal.fire({
+        icon: "error",
+        title: "Payment Failed ❌",
+        text: "Something went wrong. Please try again.",
+        confirmButtonColor: "#2ec4b6",
+      });
     }
   };
 
@@ -187,7 +220,7 @@ const Payment = () => {
           <div className="flex justify-between font-bold text-base pt-2"><p>Total</p><p>₹{total}</p></div>
         </div>
 
-        {/* Pay Button moved here */}
+        {/* Pay Button */}
         <button
           onClick={handlePayment}
           className="w-full bg-[#2ec4b6] text-white py-3 rounded hover:bg-[#29b1a3] transition-all"

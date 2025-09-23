@@ -223,14 +223,14 @@ const InstructorProfile = () => {
         </div>
 
         {/* Courses & Students */}
-        <div className="mt-6 sm:mt-8 p-4 sm:p-6 border rounded-lg bg-gradient-to-r from-[#e0f0ff] to-[#fff] shadow text-center sm:text-left">
+        {/* <div className="mt-6 sm:mt-8 p-4 sm:p-6 border rounded-lg bg-gradient-to-r from-[#e0f0ff] to-[#fff] shadow text-center sm:text-left">
           <p className="text-base sm:text-lg font-medium">
             📈 Uploaded {user.courses} Courses
           </p>
           <p className="text-base sm:text-lg font-medium">
             👨‍🎓 {user.students} Students Enrolled
           </p>
-        </div>
+        </div> */}
 
         {/* Achievements */}
         <div className="mt-6 sm:mt-8 p-4 sm:p-6 border rounded-lg bg-gray-50 shadow">

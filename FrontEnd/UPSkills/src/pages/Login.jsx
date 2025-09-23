@@ -1,9 +1,11 @@
+// filename: src/pages/Login.jsx
 import React, { useState } from 'react';
 import img1 from '../assets/login1.png';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useAuth } from "../context/AuthContext.jsx";  // ✅ use context
+import { useAuth } from "../context/AuthContext.jsx";  
+import Swal from "sweetalert2";  
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -12,13 +14,18 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();   // ✅ from context
+  const { login } = useAuth();   
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Please fill all fields ❌");
+      Swal.fire({
+        icon: "warning",
+        title: "Oops...",
+        text: "Please fill all fields ❌",
+        confirmButtonColor: "#2ec4b6",
+      });
       return;
     }
 
@@ -34,8 +41,12 @@ const Login = () => {
         localStorage.setItem("adminName", res.data.admin?.id || "Site Admin");
         localStorage.setItem("adminRole", "admin");
 
-        alert("Admin Login Successful ✅");
-        navigate("/admindashboard");
+        Swal.fire({
+          icon: "success",
+          title: "Admin Login Successful ✅",
+          text: "Welcome Admin!",
+          confirmButtonColor: "#2ec4b6",
+        }).then(() => navigate("/admindashboard"));
         return;
       }
 
@@ -45,25 +56,39 @@ const Login = () => {
         password,
       });
 
-      // ✅ save via context
       login(res.data.user, res.data.token);
 
-      alert("Login Successful ✅");
-
-      if (res.data.user.role === "student") navigate("/");
-      else if (res.data.user.role === "instructor") navigate("/instructor-dashboard");
-      else if (res.data.user.role === "admin") {
-        localStorage.setItem("adminToken", res.data.token);
-        localStorage.setItem("adminName", res.data.user.name);
-        localStorage.setItem("adminRole", res.data.user.role);
-        navigate("/admindashboard");
-      }
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful ✅",
+        text: `Welcome ${res.data.user.name || ""}`,
+        confirmButtonColor: "#2ec4b6",
+      }).then(() => {
+        if (res.data.user.role === "student") navigate("/");
+        else if (res.data.user.role === "instructor") navigate("/instructor-dashboard");
+        else if (res.data.user.role === "admin") {
+          localStorage.setItem("adminToken", res.data.token);
+          localStorage.setItem("adminName", res.data.user.name);
+          localStorage.setItem("adminRole", res.data.user.role);
+          navigate("/admindashboard");
+        }
+      });
     } catch (err) {
       console.error(err);
       if (err.response?.status === 403) {
-        alert("Your Instructor account is not approved yet ❌");
+        Swal.fire({
+          icon: "error",
+          title: "Access Denied ❌",
+          text: "Your Instructor account is not approved yet.",
+          confirmButtonColor: "#2ec4b6",
+        });
       } else {
-        alert(err.response?.data?.message || "Login failed ❌");
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed ❌",
+          text: err.response?.data?.message || "Something went wrong",
+          confirmButtonColor: "#2ec4b6",
+        });
       }
     }
   };
@@ -71,7 +96,6 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 sm:px-8 md:px-16 py-6 sm:py-10">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
-        {/* Left Side Image */}
         <div className="hidden md:block md:w-1/2 relative">
           <img
             src={img1}
@@ -80,13 +104,11 @@ const Login = () => {
           />
         </div>
 
-        {/* Right Side Form */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 md:p-10 flex flex-col justify-center">
           <h2 className="text-center text-base sm:text-lg font-semibold text-gray-600 mb-2">
             Welcome to UPSkills..!
           </h2>
 
-          {/* Tabs */}
           <div className="flex justify-center gap-3 sm:gap-4 mb-6">
             <NavLink
               to="/login"
@@ -102,7 +124,6 @@ const Login = () => {
             </NavLink>
           </div>
 
-          {/* Login Form */}
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
               <label className="text-sm font-medium text-gray-600">Email</label>

@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Upload = () => {
   const navigate = useNavigate();
 
@@ -42,7 +44,7 @@ const Upload = () => {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("⚠️ Please login as instructor to upload video");
+      await Swal.fire("⚠️ Login Required", "Please login as instructor to upload video", "warning");
       navigate("/login");
       return;
     }
@@ -66,10 +68,10 @@ const Upload = () => {
       });
 
       setFormData((prev) => ({ ...prev, video: res.data.url }));
-      alert("✅ Video uploaded successfully");
+      Swal.fire("✅ Success", "Video uploaded successfully", "success");
     } catch (err) {
       console.error(err);
-      alert("❌ Video upload failed");
+      Swal.fire("❌ Error", "Video upload failed", "error");
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -93,15 +95,15 @@ const Upload = () => {
     setQuestions([...questions, { question: "", options: ["", ""], answer: "" }]);
   };
 
-  const saveQuiz = () => {
+  const saveQuiz = async () => {
     if (!quizTitle || questions.length === 0) {
-      alert("Fill quiz title and at least one question");
+      await Swal.fire("⚠️ Missing Data", "Fill quiz title and at least one question", "warning");
       return;
     }
     setQuizzes([...quizzes, { title: quizTitle, questions }]);
     setQuizTitle("");
     setQuestions([{ question: "", options: ["", ""], answer: "" }]);
-    alert("✅ Quiz saved!");
+    Swal.fire("✅ Quiz Saved", "Quiz saved successfully!", "success");
   };
 
   // ===== Submit Course =====
@@ -110,7 +112,7 @@ const Upload = () => {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("⚠️ Please login first");
+      await Swal.fire("⚠️ Login Required", "Please login first", "warning");
       navigate("/login");
       return;
     }
@@ -125,11 +127,11 @@ const Upload = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      alert("✅ Course uploaded successfully!");
+      await Swal.fire("✅ Success", "Course uploaded successfully!", "success");
       navigate("/instructor-dashboard");
     } catch (err) {
       console.error(err);
-      alert("❌ Error uploading course");
+      Swal.fire("❌ Error", "Error uploading course", "error");
     }
   };
 

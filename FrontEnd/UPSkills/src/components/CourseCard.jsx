@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";   // ✅ Import SweetAlert2
 import lina from "../assets/lina.png";
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -34,9 +35,7 @@ const CourseCard = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await axios.get(
-          `${API_BASE}/api/courses/${courseId}`
-        );
+        const res = await axios.get(`${API_BASE}/api/courses/${courseId}`);
         setCourseData(res.data);
 
         const reviewsRes = await axios.get(
@@ -46,10 +45,9 @@ const CourseCard = () => {
 
         const token = localStorage.getItem("token");
         if (token) {
-          const wishlistRes = await axios.get(
-            `${API_BASE}/api/wishlist`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          const wishlistRes = await axios.get(`${API_BASE}/api/wishlist`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const exists = wishlistRes.data.some(
             (c) => c.courseId === res.data._id
           );
@@ -78,11 +76,23 @@ const CourseCard = () => {
   if (error) return <p className="p-6 text-center text-red-500">❌ {error}</p>;
   if (!courseData) return null;
 
+  // ✅ Styled Alert Helper
+  const showAlert = (icon, title, text) => {
+    Swal.fire({
+      icon,
+      title,
+      text,
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
+  };
+
   const handleAddToWishlist = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("⚠️ Please login to add to wishlist");
+        showAlert("warning", "Login Required", "⚠️ Please login to add to wishlist");
         navigate("/login");
         return;
       }
@@ -99,17 +109,17 @@ const CourseCard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setInWishlist(true);
-      alert("✅ Course added to wishlist!");
+      showAlert("success", "Added!", "✅ Course added to wishlist!");
     } catch (err) {
       console.error("Add to wishlist failed", err);
-      alert("❌ Could not add to wishlist");
+      showAlert("error", "Failed", "❌ Could not add to wishlist");
     }
   };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!rating || !feedback.trim()) {
-      alert("⚠️ Please provide both rating and feedback");
+      showAlert("warning", "Incomplete", "⚠️ Please provide both rating and feedback");
       return;
     }
 
@@ -123,12 +133,12 @@ const CourseCard = () => {
       );
 
       setLocalReviews((prev) => [res.data.review, ...prev]);
-      alert("✅ Review submitted successfully!");
+      showAlert("success", "Review Submitted", "✅ Your review has been added!");
       setRating(0);
       setFeedback("");
     } catch (err) {
       console.error("Submit review error:", err);
-      alert(err.response?.data?.message || "Something went wrong ❌");
+      showAlert("error", "Error", err.response?.data?.message || "Something went wrong ❌");
     } finally {
       setSubmitting(false);
     }
@@ -150,35 +160,30 @@ const CourseCard = () => {
             </p>
           </div>
         );
-    case "ratings":
-  // Calculate average rating from reviews stored in DB
-  const reviews = courseData.reviews || [];
-  const averageRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
-
-  return (
-    <div className="bg-[#e8f1fd] rounded-xl p-4 sm:p-6 space-y-4 mt-6 w-full">
-      <h3 className="text-lg sm:text-xl font-semibold">
-        {averageRating.toFixed(1)} out of 5
-      </h3>
-
-      {/* Stars based on average */}
-      <div className="flex items-center text-yellow-400 text-sm">
-        {[...Array(5)].map((_, i) => (
-          <FaStar
-            key={i}
-            className={i < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"}
-          />
-        ))}
-        <span className="ml-3 text-gray-600 font-medium">
-          {reviews.length > 0 ? `${reviews.length} reviews` : "No reviews yet"}
-        </span>
-      </div>
-    </div>
-  );
-
+      case "ratings":
+        const reviews = courseData.reviews || [];
+        const averageRating =
+          reviews.length > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            : 0;
+        return (
+          <div className="bg-[#e8f1fd] rounded-xl p-4 sm:p-6 space-y-4 mt-6 w-full">
+            <h3 className="text-lg sm:text-xl font-semibold">
+              {averageRating.toFixed(1)} out of 5
+            </h3>
+            <div className="flex items-center text-yellow-400 text-sm">
+              {[...Array(5)].map((_, i) => (
+                <FaStar
+                  key={i}
+                  className={i < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"}
+                />
+              ))}
+              <span className="ml-3 text-gray-600 font-medium">
+                {reviews.length > 0 ? `${reviews.length} reviews` : "No reviews yet"}
+              </span>
+            </div>
+          </div>
+        );
       case "reviews":
         return (
           <div className="space-y-4">
@@ -188,16 +193,10 @@ const CourseCard = () => {
                   key={idx}
                   className="bg-white p-4 rounded-xl border border-gray-200"
                 >
-                  {/* Reviewer Name */}
                   <p className="text-sm font-semibold text-gray-800">
-  {r.name || "Anonymous"}
-</p>
-
-
-                  {/* Comment */}
+                    {r.name || "Anonymous"}
+                  </p>
                   <p className="text-sm text-gray-600 mt-1">{r.comment}</p>
-
-                  {/* Stars */}
                   <div className="flex text-yellow-400 mt-1">
                     {[...Array(r.rating)].map((_, i) => (
                       <FaStar key={i} />
@@ -215,7 +214,7 @@ const CourseCard = () => {
           <div>
             <p className="text-gray-700 text-sm sm:text-base">
               {courseData.curriculum ||
-                "UPSkills LMS is an innovative learning management platform designed to help students build real-world skills through engaging, practical, and industry-relevant courses. Unlike traditional learning, UPSkills offers an interactive and flexible environment where students can access high-quality video lectures, quizzes, and assignments anytime, anywhere. The platform is built to foster collaboration and growth with features like live sessions, doubt-solving, and peer interaction, ensuring that every learner stays motivated and supported. With a wide range of courses in technology, design, business, and more, students not only gain knowledge but also receive certifications that add value to their careers. UPSkills bridges the gap between academic learning and professional success, empowering learners to upgrade themselves continuously and stay ahead in today’s competitive world."}
+                "UPSkills LMS is an innovative learning management platform designed to help students build real-world skills through engaging, practical, and industry-relevant courses..."}
             </p>
           </div>
         );
@@ -226,6 +225,7 @@ const CourseCard = () => {
 
   return (
     <div className="w-full">
+      {/* Thumbnail */}
       <div className="w-full">
         <img
           src={courseData.thumbnail || lina}
@@ -234,6 +234,7 @@ const CourseCard = () => {
         />
       </div>
 
+      {/* Main Content */}
       <div className="px-4 sm:px-6 md:px-12 lg:px-20 py-8 flex flex-col lg:flex-row gap-10">
         <div className="w-full lg:w-3/4 space-y-6">
           {/* Tabs */}
@@ -293,9 +294,7 @@ const CourseCard = () => {
                             key={star}
                             size={20}
                             className={`cursor-pointer ${
-                              rating >= star
-                                ? "text-yellow-500"
-                                : "text-gray-300"
+                              rating >= star ? "text-yellow-500" : "text-gray-300"
                             }`}
                             onClick={() => setRating(star)}
                           />
@@ -346,6 +345,7 @@ const CourseCard = () => {
             </div>
           </div>
 
+          {/* Course Info */}
           <div className="space-y-3">
             <h3 className="font-bold text-base sm:text-lg">
               This Course includes
@@ -366,6 +366,7 @@ const CourseCard = () => {
             </p>
           </div>
 
+          {/* Share Section */}
           <div className="space-y-2">
             <h3 className="font-bold text-base sm:text-lg">Share this course</h3>
             <div className="flex flex-wrap gap-3 text-gray-500">

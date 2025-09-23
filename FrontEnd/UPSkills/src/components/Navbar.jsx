@@ -48,6 +48,36 @@ const Navbar = () => {
 
     fetchUserAndNotifs();
   }, [user]);
+const formatRelativeDateTime = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const now = new Date();
+
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
+  if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? "s" : ""} ago`;
+  if (diffDays === 1) return "1 day ago";
+  if (diffDays === 2) return "2 days ago";
+  if (diffDays === 3) return "3 days ago";
+
+  // If more than 3 days → show actual date + time
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+
+  return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+};
+
 
   return (
     <>
@@ -96,12 +126,12 @@ const Navbar = () => {
                         <img src={userImg} alt="user" className="h-8 w-8 rounded-full object-cover" />
                         <span className="font-medium text-sm lg:text-base">{user.name} ▼</span>
                       </div>
-                      <button 
+                      <NavLink to="/login"
                         onClick={logout} 
                         className="px-3 lg:px-4 py-1 bg-red-500 text-white rounded-md text-xs lg:text-sm"
                       >
                         Logout
-                      </button>
+                      </NavLink>
                     </div>
                   </>
                 ) : (
@@ -136,10 +166,19 @@ const Navbar = () => {
               ) : (
                 <div className="space-y-3 sm:space-y-4">
                   {notifications.map((note, index) => (
-                    <div key={note._id || index} className="bg-green-100 text-gray-800 px-3 py-2 sm:px-4 sm:py-3 rounded-md">
-                      {note.message || note.msg}
-                    </div>
-                  ))}
+  <div 
+    key={note._id || index} 
+    className="bg-green-100 text-gray-800 px-3 py-2 sm:px-4 sm:py-3 rounded-md"
+  >
+    <div className="flex justify-between items-center">
+      <span>{note.message || note.msg}</span>
+      <span className="text-xs text-gray-500 ml-3">
+        {formatRelativeDateTime(note.createdAt)}
+      </span>
+    </div>
+  </div>
+))}
+
                 </div>
               )}
             </div>

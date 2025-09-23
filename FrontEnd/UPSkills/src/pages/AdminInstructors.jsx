@@ -3,8 +3,10 @@ import axios from 'axios';
 import logo from '../assets/UPSkills-whitelogo.png';
 import { NavLink } from 'react-router-dom';
 import Footer from '../components/Footer';
+import Swal from 'sweetalert2';
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const AdminInstructors = () => {
   const [instructors, setInstructors] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -20,7 +22,6 @@ const AdminInstructors = () => {
         const res = await axios.get(`${API_BASE}/api/admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         const instructorsOnly = res.data.filter(user => user.role === 'instructor');
         setInstructors(instructorsOnly);
         setSelected(instructorsOnly[0] || null);
@@ -61,8 +62,18 @@ const AdminInstructors = () => {
 
   const handleDelete = async (id) => {
     if (!id) return;
-    const confirmDelete = window.confirm('Are you sure you want to delete this instructor? ❌');
-    if (!confirmDelete) return;
+
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this instructor? ❌',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       await axios.delete(`${API_BASE}/api/admin/users/${id}`, {
@@ -70,10 +81,10 @@ const AdminInstructors = () => {
       });
       setInstructors(prev => prev.filter(ins => ins._id !== id));
       setSelected(null);
-      alert('Instructor deleted successfully ✅');
+      Swal.fire('Deleted!', 'Instructor deleted successfully ✅', 'success');
     } catch (err) {
       console.error('Failed to delete instructor:', err.response?.data || err);
-      alert(err.response?.data?.message || 'Failed to delete instructor 😢');
+      Swal.fire('Error', err.response?.data?.message || 'Failed to delete instructor 😢', 'error');
     }
   };
 
@@ -88,7 +99,6 @@ const AdminInstructors = () => {
           <NavLink to="/admindashboard" className="hover:bg-[#1a2a50] px-4 py-2 rounded">🏠 Dashboard</NavLink>
           <NavLink to="/admin-instructors" className="bg-[#16c9c6] px-4 py-2 rounded">👩‍🏫 Instructors</NavLink>
           <NavLink to="/admin-students" className="hover:bg-[#1a2a50] px-4 py-2 rounded">🧑‍🎓 Students</NavLink>
-          {/* <NavLink to="/admin-transactions" className="hover:bg-[#1a2a50] px-4 py-2 rounded">💸 Transactions</NavLink> */}
         </nav>
       </div>
 
@@ -144,15 +154,23 @@ const AdminInstructors = () => {
                 <button
                   className="bg-green-500 text-white px-3 py-1 rounded"
                   onClick={async () => {
-                    if (!window.confirm('Approve this instructor? ✅')) return;
+                    const confirm = await Swal.fire({
+                      title: 'Approve this instructor?',
+                      icon: 'question',
+                      showCancelButton: true,
+                      confirmButtonColor: '#28a745',
+                      cancelButtonColor: '#3085d6',
+                      confirmButtonText: 'Yes, approve!'
+                    });
+                    if (!confirm.isConfirmed) return;
                     try {
                       await axios.put(`${API_BASE}/api/admin/approve-instructor/${selected._id}`, {}, {
                         headers: { Authorization: `Bearer ${token}` },
                       });
-                      alert('Instructor approved ✅');
+                      Swal.fire('Approved!', 'Instructor approved ✅', 'success');
                     } catch (err) {
                       console.error(err);
-                      alert('Failed to approve instructor ❌');
+                      Swal.fire('Error', 'Failed to approve instructor ❌', 'error');
                     }
                   }}
                 >
@@ -161,17 +179,25 @@ const AdminInstructors = () => {
                 <button
                   className="bg-red-500 text-white px-3 py-1 rounded"
                   onClick={async () => {
-                    if (!window.confirm('Decline and delete this instructor? ❌')) return;
+                    const confirm = await Swal.fire({
+                      title: 'Decline and delete this instructor?',
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#d33',
+                      cancelButtonColor: '#3085d6',
+                      confirmButtonText: 'Yes, decline!'
+                    });
+                    if (!confirm.isConfirmed) return;
                     try {
                       await axios.delete(`${API_BASE}/api/admin/decline-instructor/${selected._id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                       });
                       setInstructors(prev => prev.filter(ins => ins._id !== selected._id));
                       setSelected(null);
-                      alert('Instructor declined ❌');
+                      Swal.fire('Declined!', 'Instructor declined ❌', 'success');
                     } catch (err) {
                       console.error(err);
-                      alert('Failed to decline instructor ❌');
+                      Swal.fire('Error', 'Failed to decline instructor ❌', 'error');
                     }
                   }}
                 >

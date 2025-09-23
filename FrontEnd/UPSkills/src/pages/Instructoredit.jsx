@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaEdit, FaPlus } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 import Footer from "../components/Footer";
 import Instructornavbar from "../components/Instructornavbar";
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const Instructoredit = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const Instructoredit = () => {
         setQuizzes(res.data.quizzes || []);
       } catch (err) {
         console.error(err);
-        alert("Failed to fetch course details");
+        Swal.fire("❌ Error", "Failed to fetch course details", "error");
       }
     };
     fetchCourse();
@@ -65,7 +66,7 @@ const Instructoredit = () => {
     if (!file) return;
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("⚠️ Please login as instructor to upload video");
+      await Swal.fire("⚠️ Login Required", "Please login as instructor to upload video", "warning");
       navigate("/login");
       return;
     }
@@ -95,10 +96,10 @@ const Instructoredit = () => {
       );
 
       setFormData((prev) => ({ ...prev, video: res.data.url }));
-      alert("✅ Video uploaded successfully");
+      Swal.fire("✅ Success", "Video uploaded successfully", "success");
     } catch (err) {
       console.error("Video upload failed", err);
-      alert("❌ Video upload failed");
+      Swal.fire("❌ Error", "Video upload failed", "error");
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -123,11 +124,11 @@ const Instructoredit = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Course updated successfully!");
+      Swal.fire("✅ Success", "Course updated successfully!", "success");
       navigate("/instructor-dashboard");
     } catch (err) {
       console.error(err);
-      alert("Error updating course");
+      Swal.fire("❌ Error", "Error updating course", "error");
     }
   };
 
@@ -178,81 +179,79 @@ const Instructoredit = () => {
   };
 
   const handleSaveQuiz = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("You must be logged in as instructor");
-      return;
-    }
-
-    // Validation
-    if (!quizForm.title.trim()) {
-      alert("Quiz title is required");
-      return;
-    }
-    for (const q of quizForm.questions) {
-      if (!q.question.trim()) {
-        alert("Each question must have text");
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        await Swal.fire("⚠️ Login Required", "You must be logged in as instructor", "warning");
         return;
       }
-      if (q.options.length < 2) {
-        alert("Each question must have at least 2 options");
+
+      // Validation
+      if (!quizForm.title.trim()) {
+        await Swal.fire("⚠️ Missing Title", "Quiz title is required", "warning");
         return;
       }
-      if (!q.answer.trim()) {
-        alert("Each question must have a correct answer");
-        return;
+      for (const q of quizForm.questions) {
+        if (!q.question.trim()) {
+          await Swal.fire("⚠️ Missing Question", "Each question must have text", "warning");
+          return;
+        }
+        if (q.options.length < 2) {
+          await Swal.fire("⚠️ Options Error", "Each question must have at least 2 options", "warning");
+          return;
+        }
+        if (!q.answer.trim()) {
+          await Swal.fire("⚠️ Missing Answer", "Each question must have a correct answer", "warning");
+          return;
+        }
       }
-    }
 
-    const payload = {
-      title: quizForm.title,
-      questions: quizForm.questions.map((q) => ({
-        question: q.question,
-        options: q.options,
-        answer: q.answer,
-      })),
-    };
+      const payload = {
+        title: quizForm.title,
+        questions: quizForm.questions.map((q) => ({
+          question: q.question,
+          options: q.options,
+          answer: q.answer,
+        })),
+      };
 
-    let res;
+      if (editingQuizId && editingQuizId !== "new") {
+        await axios.put(
+          `${API_BASE}/api/courses/${courseId}/quiz/${editingQuizId}`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } else {
+        await axios.post(
+          `${API_BASE}/api/courses/${courseId}/quiz`,
+          payload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
 
-    if (editingQuizId && editingQuizId !== "new") {
-      // ✅ Edit existing quiz
-      res = await axios.put(
-        `${API_BASE}/api/courses/${courseId}/quiz/${editingQuizId}`,
-        payload,
+      Swal.fire("✅ Success", "Quiz saved successfully", "success");
+
+      // Fetch fresh quizzes
+      const updated = await axios.get(
+        `${API_BASE}/api/courses/${courseId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-    } else {
-      // ✅ Add new quiz
-      res = await axios.post(
-        `${API_BASE}/api/courses/${courseId}/quiz`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+      setQuizzes(updated.data.quizzes || []);
+
+      setQuizForm({
+        title: "",
+        questions: [{ question: "", options: ["", ""], answer: "" }],
+      });
+      setEditingQuizId(null);
+    } catch (err) {
+      console.error("Save quiz error:", err.response?.data || err.message);
+      await Swal.fire(
+        "❌ Error",
+        "Failed to save quiz: " + (err.response?.data?.message || err.message),
+        "error"
       );
     }
-
-    alert("Quiz saved successfully");
-
-    // ✅ Fetch fresh quizzes from backend
-    const updated = await axios.get(
-      `${API_BASE}/api/courses/${courseId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setQuizzes(updated.data.quizzes || []);
-
-    // Reset form
-    setQuizForm({
-      title: "",
-      questions: [{ question: "", options: ["", ""], answer: "" }],
-    });
-    setEditingQuizId(null);
-  } catch (err) {
-    console.error("Save quiz error:", err.response?.data || err.message);
-    alert("Failed to save quiz: " + (err.response?.data?.message || err.message));
-  }
-};
-
+  };
 
   const handleCancelQuiz = () => {
     setEditingQuizId(null);

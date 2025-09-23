@@ -242,3 +242,69 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+// Send OTP
+export const sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email required" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpiry = Date.now() + 10 * 60 * 1000; // valid for 10 min
+    await user.save();
+
+    // send mail
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"UPSkills" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "UPSkills - OTP Verification",
+      text: `Your OTP is ${otp}. It will expire in 10 minutes.`,
+    });
+
+    res.json({ message: "OTP sent to email ✅" });
+  } catch (err) {
+    console.error("sendOtp Error:", err);
+    res.status(500).json({ message: "Error sending OTP" });
+  }
+};
+
+// Verify OTP & Reset Password
+export const resetPasswordWithOtp = async (req, res) => {
+  try {
+    const { email, otp, password } = req.body;
+
+    if (!email || !otp || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.otp !== otp || Date.now() > user.otpExpiry) {
+      return res.status(400).json({ message: "Invalid or expired OTP ❌" });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
+
+    res.json({ message: "Password reset successful ✅" });
+  } catch (err) {
+    console.error("resetPasswordWithOtp Error:", err);
+    res.status(500).json({ message: "Error resetting password" });
+  }
+};

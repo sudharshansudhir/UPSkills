@@ -3,8 +3,9 @@ import axios from 'axios';
 import logo from '../assets/UPSkills-whitelogo.png';
 import { NavLink } from 'react-router-dom';
 import Footer from '../components/Footer';
+import Swal from 'sweetalert2';
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
@@ -55,9 +56,19 @@ const AdminStudents = () => {
     });
 
   const handleDelete = async (studentId) => {
-    if (!studentId) return alert("Student ID is missing!");
-    const confirmDelete = window.confirm("Are you sure you want to delete this student? ❌");
-    if (!confirmDelete) return;
+    if (!studentId) return Swal.fire('Error', 'Student ID is missing!', 'error');
+
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this student? ❌',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const token = localStorage.getItem("adminToken");
@@ -67,10 +78,10 @@ const AdminStudents = () => {
 
       setStudents(prev => prev.filter(s => s._id !== studentId));
       setSelected(null);
-      alert("Student deleted successfully ✅");
+      Swal.fire('Deleted!', 'Student deleted successfully ✅', 'success');
     } catch (err) {
       console.error("Failed to delete student:", err.response?.data || err);
-      alert(err.response?.data?.message || "Failed to delete student. 😢");
+      Swal.fire('Error', err.response?.data?.message || 'Failed to delete student 😢', 'error');
     }
   };
 
@@ -85,8 +96,6 @@ const AdminStudents = () => {
           <NavLink to="/admindashboard" className="hover:bg-[#1a2a50] px-4 py-2 rounded">🏠 Dashboard</NavLink>
           <NavLink to="/admin-instructors" className="hover:bg-[#1a2a50] px-4 py-2 rounded">👩‍🏫 Instructors</NavLink>
           <NavLink to="/admin-students" className="bg-[#16c9c6] px-4 py-2 rounded">🧑‍🎓 Students</NavLink>
-          
-          {/* <NavLink to="/admin-transactions" className="hover:bg-[#1a2a50] px-4 py-2 rounded">💸 Transactions</NavLink> */}
         </nav>
       </div>
 
@@ -139,9 +148,12 @@ const AdminStudents = () => {
               <p>🏠 Address: {selected.address || "N/A"}</p>
               
               <div className="flex flex-wrap gap-2 mt-4">
-                {/* <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">✅ Approve</button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">❌ Decline</button> */}
-                <button onClick={() => handleDelete(selected._id)} className="bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-900">🗑️ Delete</button>
+                <button 
+                  onClick={() => handleDelete(selected._id)} 
+                  className="bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-900"
+                >
+                  🗑️ Delete
+                </button>
               </div>
             </div>
           )}

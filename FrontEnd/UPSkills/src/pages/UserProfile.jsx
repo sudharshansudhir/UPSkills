@@ -6,24 +6,7 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import axios from "axios";
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
-
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-} from "recharts";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const UserProfile = ({ role = "student" }) => {
   const [user, setUser] = useState(null);
@@ -55,7 +38,6 @@ const UserProfile = ({ role = "student" }) => {
           dob: fetchedUser.dob || "",
           address: fetchedUser.address || "",
           badges: fetchedUser.badges || [],
-          enrolledCourses: fetchedUser.enrolledCourses || 0,
         });
 
         setDraftUser({
@@ -64,7 +46,6 @@ const UserProfile = ({ role = "student" }) => {
           dob: fetchedUser.dob || "",
           address: fetchedUser.address || "",
           badges: fetchedUser.badges || [],
-          enrolledCourses: fetchedUser.enrolledCourses || 0,
         });
 
         setBadges(fetchedUser.badges || []);
@@ -87,24 +68,6 @@ const UserProfile = ({ role = "student" }) => {
   if (!user)
     return <p className="text-center mt-20 text-red-500">User not found!</p>;
 
-  // Sample Analytics Data
-  const performanceData = [
-    { subject: "AWS", score: 85 },
-    { subject: "React", score: 92 },
-    { subject: "Python", score: 76 },
-    { subject: "UI/UX", score: 88 },
-    { subject: "DevOps", score: 70 },
-  ];
-
-  const activityData = [
-    { month: "Jan", hours: 15 },
-    { month: "Feb", hours: 18 },
-    { month: "Mar", hours: 12 },
-    { month: "Apr", hours: 22 },
-    { month: "May", hours: 25 },
-    { month: "Jun", hours: 19 },
-  ];
-
   // Handlers
   const handleChange = (e) =>
     setDraftUser({ ...draftUser, [e.target.name]: e.target.value });
@@ -114,11 +77,9 @@ const UserProfile = ({ role = "student" }) => {
       const token = localStorage.getItem("token");
       const updatedUser = { ...draftUser, badges };
 
-      const res = await axios.put(
-        `${API_BASE}/api/auth/me`,
-        updatedUser,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.put(`${API_BASE}/api/auth/me`, updatedUser, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const updated = res.data || {};
       setUser(updated);
@@ -215,15 +176,6 @@ const UserProfile = ({ role = "student" }) => {
           />
         </div>
 
-        {/* Enrolled Info */}
-        <div className="mt-6 sm:mt-8 p-4 sm:p-6 border rounded-lg bg-gradient-to-r from-[#f3f9ff] to-[#fff] shadow text-center">
-          <p className="text-base sm:text-lg font-medium">
-            📚 Enrolled in{" "}
-            <span className="text-[#2ec4b6]">{user.enrolledCourses || 0}</span>{" "}
-            Courses
-          </p>
-        </div>
-
         {/* Badges */}
         <div className="mt-8 sm:mt-10">
           <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 text-gray-700">
@@ -269,73 +221,6 @@ const UserProfile = ({ role = "student" }) => {
               </button>
             </div>
           )}
-        </div>
-
-        {/* Analytics Section */}
-        <div className="mt-10 sm:mt-12">
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-6 text-gray-700 text-center">
-            📊 Student Analytics
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            {/* Performance Chart */}
-            <div className="p-4 sm:p-6 bg-white shadow rounded-xl border">
-              <h4 className="text-base sm:text-lg font-semibold mb-4">
-                Performance by Subject
-              </h4>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={performanceData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="subject" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="score" fill="#2ec4b6" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Learning Activity */}
-            <div className="p-4 sm:p-6 bg-white shadow rounded-xl border">
-              <h4 className="text-base sm:text-lg font-semibold mb-4">
-                Monthly Study Hours
-              </h4>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={activityData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="hours"
-                    stroke="#16c9c6"
-                    strokeWidth={3}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Skill Radar */}
-            <div className="md:col-span-2 p-4 sm:p-6 bg-white shadow rounded-xl border">
-              <h4 className="text-base sm:text-lg font-semibold mb-4">
-                Skill Radar
-              </h4>
-              <ResponsiveContainer width="100%" height={300} minHeight={250}>
-                <RadarChart data={performanceData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="subject" />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                  <Radar
-                    name="Student"
-                    dataKey="score"
-                    stroke="#2ec4b6"
-                    fill="#2ec4b6"
-                    fillOpacity={0.6}
-                  />
-                  <Tooltip />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
         </div>
 
         {/* Buttons */}
