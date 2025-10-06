@@ -72,8 +72,8 @@ const router = createBrowserRouter([
   { path: "/quiz-create", element: <QuizCreate /> },
   { path: "/quiz-results/:id", element: <QuizResults /> },
   { path: "/currentcourse/:id", element: <CurrentCourse /> },
-  { path: "/forgotpassword", element: <Forgot /> },
-  { path: "/reset-password", element: <ResetPassword/> },
+  // { path: "/forgotpassword", element: <Forgot /> },
+  // { path: "/reset-password", element: <ResetPassword/> },
   { path: "*", element: <App/> },
 ])
 
