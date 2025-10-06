@@ -6,7 +6,8 @@ import axios from 'axios';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext.jsx";  
 import Swal from "sweetalert2";  
-
+import Navbar from "../components/Navbar.jsx"
+import Footer from "../components/Footer.jsx"
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 const Login = () => {
@@ -94,6 +95,8 @@ const Login = () => {
   };
 
   return (
+    <>
+    <Navbar/>
     <div className="min-h-screen flex items-center justify-center bg-white px-4 sm:px-8 md:px-16 py-6 sm:py-10">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
         <div className="hidden md:block md:w-1/2 relative">
@@ -156,12 +159,7 @@ const Login = () => {
             </div>
 
             <div className="text-right mt-2">
-              <NavLink
-                to="/forgotpassword"
-                className="text-sm text-[#2ec4b6] hover:underline"
-              >
-                Forgot Password?
-              </NavLink>
+
             </div>
             <button
               type="submit"
@@ -173,7 +171,8 @@ const Login = () => {
         </div>
       </div>
     </div>
-  );
+    <Footer/>
+  </>);
 };
 
 export default Login;

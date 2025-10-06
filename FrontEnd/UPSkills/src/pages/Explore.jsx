@@ -18,7 +18,7 @@ const Explore = () => {
       <Recommended/>
       <TopInstructor/>
       <ForYou/>
-      <Testimonial/>
+      {/* <Testimonial/> */}
       <Discount/>
       <Footer/>
     </div>

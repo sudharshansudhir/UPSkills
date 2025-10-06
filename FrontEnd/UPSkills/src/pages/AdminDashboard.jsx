@@ -98,6 +98,9 @@ const AdminDashboard = () => {
           <NavLink to="/admin-students" className="flex items-center gap-2 px-4 py-2 hover:bg-[#1a3261] rounded-md">
             🧑‍🎓 Students
           </NavLink>
+          <NavLink to="/admin-courses" className="flex items-center gap-2 px-4 py-2 hover:bg-[#1a3261] rounded-md">
+            📚 Courses
+          </NavLink>
         </nav>
       </div>
 
@@ -122,7 +125,8 @@ const AdminDashboard = () => {
             <EmojiStatCard icon="👥" title="Total Users" value={usersAnalytics?.totalUsers ?? 0} color="bg-blue-100" />
             <EmojiStatCard icon="🎓" title="Students" value={usersAnalytics?.students ?? 0} color="bg-green-100" />
             <EmojiStatCard icon="👩‍🏫" title="Instructors" value={usersAnalytics?.instructors ?? 0} color="bg-purple-100" />
-            <EmojiStatCard icon="⏳" title="Pending Instructors" value={usersAnalytics?.pendingInstructors ?? 0} color="bg-yellow-100" />
+            <EmojiStatCard icon="📚" title="Total Courses" value={usersAnalytics?.courses ?? 0} color="bg-yellow-100" />
+
           </div>
 
           {/* ✅ Statistics Graphs Section */}

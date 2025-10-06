@@ -28,7 +28,7 @@ const Welcome = () => {
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (!courses || courses.length === 0)
-    return <div className="p-6">No enrolled courses yet</div>;
+    return <div></div> 
 
   return (
     <section className="bg-[#eaf6ff] px-4 sm:px-6 md:px-20 py-10">

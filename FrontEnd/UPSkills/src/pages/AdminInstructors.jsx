@@ -99,6 +99,7 @@ const AdminInstructors = () => {
           <NavLink to="/admindashboard" className="hover:bg-[#1a2a50] px-4 py-2 rounded">🏠 Dashboard</NavLink>
           <NavLink to="/admin-instructors" className="bg-[#16c9c6] px-4 py-2 rounded">👩‍🏫 Instructors</NavLink>
           <NavLink to="/admin-students" className="hover:bg-[#1a2a50] px-4 py-2 rounded">🧑‍🎓 Students</NavLink>
+          <NavLink to="/admin-courses" className="hover:bg-[#1a2a50] px-4 py-2 rounded">📚 Courses</NavLink>
         </nav>
       </div>
 

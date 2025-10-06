@@ -4,6 +4,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Swal from "sweetalert2";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -28,16 +30,62 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // FRONTEND VALIDATION
+  const validateForm = () => {
+    const { name, email, phone, dob, address, password, confirmPassword } = formData;
+
+    // Name: letters only + single space, max 20 chars
+    const nameRegex = /^[A-Za-z]+(?: [A-Za-z]+)?$/;
+    if (!name || !nameRegex.test(name) || name.length > 20) {
+      Swal.fire({ icon: "error", title: "Name must be letters only, max 20 characters, one space allowed", confirmButtonColor: "#2ec4b6" });
+      return false;
+    }
+
+    // Email: must contain @ and valid
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      Swal.fire({ icon: "error", title: "Enter a valid email", confirmButtonColor: "#2ec4b6" });
+      return false;
+    }
+
+    // Phone: numeric only, 10 digits
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phone || !phoneRegex.test(phone)) {
+      Swal.fire({ icon: "error", title: "Phone must be 10 digits", confirmButtonColor: "#2ec4b6" });
+      return false;
+    }
+
+    // DOB: must be past date
+    if (!dob || new Date(dob) >= new Date()) {
+      Swal.fire({ icon: "error", title: "Enter a valid date of birth", confirmButtonColor: "#2ec4b6" });
+      return false;
+    }
+
+    // Address: minimum 5 characters
+    if (!address || address.trim().length < 5) {
+      Swal.fire({ icon: "error", title: "Address must be at least 5 characters", confirmButtonColor: "#2ec4b6" });
+      return false;
+    }
+
+    // Password: min 6 chars, at least one letter and one number
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+    if (!password || !passwordRegex.test(password)) {
+      Swal.fire({ icon: "error", title: "Password must be at least 6 characters with a number", confirmButtonColor: "#2ec4b6" });
+      return false;
+    }
+
+    // Confirm Password match
+    if (password !== confirmPassword) {
+      Swal.fire({ icon: "error", title: "Passwords do not match", confirmButtonColor: "#2ec4b6" });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      Swal.fire({
-        icon: "error",
-        title: "Passwords do not match ❌",
-        confirmButtonColor: "#2ec4b6",
-      });
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       const payload = {
@@ -52,27 +100,18 @@ const Register = () => {
 
       const res = await axios.post(`${API_BASE}/api/auth/register`, payload);
 
-      // Backend returns message and user.isApproved
       const user = res.data.user;
       const msg = res.data.message || "Registered successfully";
 
       if (user.role === "instructor") {
-        Swal.fire({
-          icon: "info",
-          title: msg || "Registered! Wait for admin approval.",
-          confirmButtonColor: "#2ec4b6",
-        }).then(() => navigate("/login"));
+        Swal.fire({ icon: "info", title: msg || "Registered! Wait for admin approval.", confirmButtonColor: "#2ec4b6" })
+          .then(() => navigate("/login"));
       } else {
-        // student — auto-save token and login
         localStorage.setItem("token", res.data.token);
-        Swal.fire({
-          icon: "success",
-          title: "Registered & logged in ✅",
-          confirmButtonColor: "#2ec4b6",
-        }).then(() => navigate("/"));
+        Swal.fire({ icon: "success", title: "Registered & logged in ✅", confirmButtonColor: "#2ec4b6" })
+          .then(() => navigate("/"));
       }
     } catch (err) {
-      console.error(err);
       Swal.fire({
         icon: "error",
         title: err.response?.data?.message || "Registration failed ❌",
@@ -82,147 +121,151 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4 md:px-16 py-10">
-      <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
-        <div className="md:w-1/2 hidden md:block relative">
-          <img
-            src={img2}
-            alt="register visual"
-            className="h-full w-full object-cover rounded-l-xl"
-          />
-        </div>
-
-        <div className="md:w-1/2 w-full p-6 md:p-10 flex flex-col justify-center">
-          <h2 className="text-center text-lg font-semibold text-gray-600 mb-2">
-            Welcome to UPSkills..!
-          </h2>
-
-          <div className="flex justify-center gap-4 mb-6">
-            <NavLink
-              to="/login"
-              className="px-6 py-2 rounded-full border border-[#2ec4b6] text-[#2ec4b6] font-medium"
-            >
-              Login
-            </NavLink>
-            <NavLink
-              to="/register"
-              className="px-6 py-2 rounded-full bg-[#2ec4b6] text-white font-medium"
-            >
-              Register
-            </NavLink>
+    <div>
+      <Navbar/>
+      <div className="min-h-screen flex items-center justify-center bg-white px-4 md:px-16 py-10">
+        <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
+          <div className="md:w-1/2 hidden md:block relative">
+            <img
+              src={img2}
+              alt="register visual"
+              className="h-full w-full object-cover rounded-l-xl"
+            />
           </div>
 
-          <form className="space-y-5" onSubmit={handleRegister}>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Full Name"
-              required
-              className="w-full px-4 py-2 border rounded-md"
-            />
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              required
-              className="w-full px-4 py-2 border rounded-md"
-            />
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Phone"
-              required
-              className="w-full px-4 py-2 border rounded-md"
-            />
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-md"
-            />
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Address"
-              required
-              className="w-full px-4 py-2 border rounded-md"
-            />
+          <div className="md:w-1/2 w-full p-6 md:p-10 flex flex-col justify-center">
+            <h2 className="text-center text-lg font-semibold text-gray-600 mb-2">
+              Welcome to UPSkills..!
+            </h2>
 
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md"
-            >
-              <option value="student">Student</option>
-              <option value="instructor">Instructor</option>
-            </select>
-
-            <div className="relative w-full">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                required
-                className="w-full px-4 py-2 border rounded-md pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            <div className="flex justify-center gap-4 mb-6">
+              <NavLink
+                to="/login"
+                className="px-6 py-2 rounded-full border border-[#2ec4b6] text-[#2ec4b6] font-medium"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
+                Login
+              </NavLink>
+              <NavLink
+                to="/register"
+                className="px-6 py-2 rounded-full bg-[#2ec4b6] text-white font-medium"
+              >
+                Register
+              </NavLink>
             </div>
 
-            <div className="relative w-full">
+            <form className="space-y-5" onSubmit={handleRegister}>
               <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                placeholder="Confirm Password"
+                placeholder="Full Name"
                 required
-                className={`w-full px-4 py-2 border rounded-md pr-10 ${
-                  formData.confirmPassword
-                    ? formData.confirmPassword === formData.password
-                      ? "border-green-500"
-                      : "border-red-500"
-                    : ""
-                }`}
+                className="w-full px-4 py-2 border rounded-md"
               />
-              <button
-                type="button"
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-              >
-                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email"
+                required
+                className="w-full px-4 py-2 border rounded-md"
+              />
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="Phone"
+                required
+                className="w-full px-4 py-2 border rounded-md"
+              />
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border rounded-md"
+              />
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Address"
+                required
+                className="w-full px-4 py-2 border rounded-md"
+              />
 
-            <button
-              type="submit"
-              className="w-full py-2 mt-4 rounded-full bg-[#2ec4b6] text-white font-medium hover:bg-[#27b2a6] transition"
-            >
-              Register
-            </button>
-          </form>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+              >
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+              </select>
+
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  required
+                  className="w-full px-4 py-2 border rounded-md pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              <div className="relative w-full">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                  required
+                  className={`w-full px-4 py-2 border rounded-md pr-10 ${
+                    formData.confirmPassword
+                      ? formData.confirmPassword === formData.password
+                        ? "border-green-500"
+                        : "border-red-500"
+                      : ""
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2 mt-4 rounded-full bg-[#2ec4b6] text-white font-medium hover:bg-[#27b2a6] transition"
+              >
+                Register
+              </button>
+            </form>
+          </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };

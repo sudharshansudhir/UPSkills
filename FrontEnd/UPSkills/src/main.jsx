@@ -33,6 +33,9 @@ import CurrentCourse from './pages/CurrentCourse.jsx'
 import Forgot from './pages/Forgot.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import App from './App.jsx'
+import Contact from './pages/Contact.jsx';
+import Services from './pages/Services.jsx';
+import AdminCourses from './pages/AdminCourses.jsx';
 
 // ✅ App start aagumbodhu localStorage la token irundha auto attach aagum
 const token = localStorage.getItem("token");
@@ -43,6 +46,8 @@ if (token) {
 const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
   { path: "/aboutus", element: <AboutUs /> },
+  { path: "/contactus", element: <Contact/> },
+  { path: "/services", element: <Services/> },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
   { path: "/courses", element: <Courses /> },
@@ -51,6 +56,7 @@ const router = createBrowserRouter([
   { path: "/admindashboard", element: <AdminDashboard /> },
   { path: "/admin-instructors", element: <AdminInstructors /> },
   { path: "/admin-students", element: <AdminStudents /> },
+  { path: "/admin-courses", element: <AdminCourses /> },
   { path: "/explore", element: <Explore /> },
   { path: "/notifications", element: <NotificationPage /> },
   { path: "/wishlist", element: <WishlistPage /> },

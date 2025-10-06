@@ -48,36 +48,36 @@ const Navbar = () => {
 
     fetchUserAndNotifs();
   }, [user]);
-const formatRelativeDateTime = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const now = new Date();
 
-  const diffMs = now - date;
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const formatRelativeDateTime = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
 
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
-  if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? "s" : ""} ago`;
-  if (diffDays === 1) return "1 day ago";
-  if (diffDays === 2) return "2 days ago";
-  if (diffDays === 3) return "3 days ago";
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  // If more than 3 days → show actual date + time
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays === 1) return "1 day ago";
+    if (diffDays === 2) return "2 days ago";
+    if (diffDays === 3) return "3 days ago";
 
-  let hours = date.getHours();
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12 || 12;
+    // If more than 3 days → show actual date + time
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
 
-  return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
-};
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
 
+    return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+  };
 
   return (
     <>
@@ -89,13 +89,18 @@ const formatRelativeDateTime = (dateString) => {
             <div className="flex gap-10 lg:gap-20 items-center">
               <div className="flex gap-6 lg:gap-10 items-center text-sm lg:text-base">
                 <NavLink to="/" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Home</NavLink>
+                <NavLink to="/courses" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Courses</NavLink>
+                <NavLink to="/explore" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Explore</NavLink>
+                <NavLink to="/aboutus" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>About Us</NavLink>
+                <NavLink to="/services" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Services</NavLink>
+                <NavLink to="/contactus" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Contact Us</NavLink>
+
+                {/* Wishlist only for student */}
                 {user && user.role === "student" && (
-                  <>
-                    <NavLink to="/courses" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Courses</NavLink>
-                    <NavLink to="/explore" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>Explore</NavLink>
-                    <NavLink to="/wishlist" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>MyWishlist</NavLink>
-                  </>
+                  <NavLink to="/wishlist" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>MyWishlist</NavLink>
                 )}
+
+                {/* Instructor only links */}
                 {user && user.role === "instructor" && (
                   <>
                     <NavLink to="/instructor-students" className={({ isActive }) => isActive ? 'active_l' : 'not_l'}>MyStudents</NavLink>
@@ -136,9 +141,21 @@ const formatRelativeDateTime = (dateString) => {
                   </>
                 ) : (
                   <div className="flex gap-3">
-                    <NavLink to="/login" className="px-4 lg:px-6 py-2 bg-gray-300 rounded-full text-gray-800 text-xs lg:text-sm font-medium">Login</NavLink>
-                    <NavLink to="/register" className="px-4 lg:px-6 py-2 bg-gray-500 rounded-full text-white text-xs lg:text-sm font-medium">Register</NavLink>
-                  </div>
+  <NavLink
+    to="/login"
+    className="px-6 py-2 bg-teal-700 text-white rounded-full text-xs lg:text-sm font-medium 
+               hover:bg-teal-800 transition-colors duration-200"
+  >
+    Login
+  </NavLink>
+  <NavLink
+    to="/register"
+    className="px-6 py-2 bg-white text-teal-700 rounded-full text-xs lg:text-sm font-medium 
+               border border-teal-700 hover:bg-teal-50 transition-colors duration-200"
+  >
+    Register
+  </NavLink>
+</div>
                 )}
               </div>
             </div>
@@ -166,19 +183,18 @@ const formatRelativeDateTime = (dateString) => {
               ) : (
                 <div className="space-y-3 sm:space-y-4">
                   {notifications.map((note, index) => (
-  <div 
-    key={note._id || index} 
-    className="bg-green-100 text-gray-800 px-3 py-2 sm:px-4 sm:py-3 rounded-md"
-  >
-    <div className="flex justify-between items-center">
-      <span>{note.message || note.msg}</span>
-      <span className="text-xs text-gray-500 ml-3">
-        {formatRelativeDateTime(note.createdAt)}
-      </span>
-    </div>
-  </div>
-))}
-
+                    <div 
+                      key={note._id || index} 
+                      className="bg-green-100 text-gray-800 px-3 py-2 sm:px-4 sm:py-3 rounded-md"
+                    >
+                      <div className="flex justify-between items-center">
+                        <span>{note.message || note.msg}</span>
+                        <span className="text-xs text-gray-500 ml-3">
+                          {formatRelativeDateTime(note.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -212,14 +228,16 @@ const formatRelativeDateTime = (dateString) => {
               Home
             </NavLink>
 
+            {/* Always visible */}
+            <NavLink to="/courses" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>Courses</NavLink>
+            <NavLink to="/explore" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>Explore</NavLink>
+
+            {/* Wishlist only student */}
             {user && user.role === "student" && (
-              <>
-                <NavLink to="/courses" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>Courses</NavLink>
-                <NavLink to="/explore" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>Explore</NavLink>
-                <NavLink to="/wishlist" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>MyWishlist</NavLink>
-              </>
+              <NavLink to="/wishlist" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>MyWishlist</NavLink>
             )}
 
+            {/* Instructor only */}
             {user && user.role === "instructor" && (
               <>
                 <NavLink to="/instructor-students" className={({ isActive }) => isActive ? "active" : "not"} onClick={() => setIsOpen(false)}>MyStudents</NavLink>
@@ -243,10 +261,24 @@ const formatRelativeDateTime = (dateString) => {
                   <NavLink to="/login" onClick={logout} className="mt-2 text-red-500 text-sm font-medium text-left">Logout</NavLink>
                 </>
               ) : (
-                <>
-                  <NavLink to="/login" className="px-6 py-2 bg-gray-100 rounded-full text-gray-700 font-medium" onClick={() => setIsOpen(false)}>Login</NavLink>
-                  <NavLink to="/register" className="px-6 py-2 bg-gray-500 text-white rounded-full font-medium" onClick={() => setIsOpen(false)}>Register</NavLink>
-                </>
+                <div className="flex flex-col gap-3 pt-6">
+  <NavLink
+    to="/login"
+    className="px-6 py-2 bg-teal-700 text-white rounded-full text-sm font-medium 
+               hover:bg-teal-800 transition-colors duration-200"
+    onClick={() => setIsOpen(false)}
+  >
+    Login
+  </NavLink>
+  <NavLink
+    to="/register"
+    className="px-6 py-2 bg-white text-teal-700 rounded-full text-sm font-medium 
+               border border-teal-700 hover:bg-teal-50 transition-colors duration-200"
+    onClick={() => setIsOpen(false)}
+  >
+    Register
+  </NavLink>
+</div>
               )}
             </div>
           </div>

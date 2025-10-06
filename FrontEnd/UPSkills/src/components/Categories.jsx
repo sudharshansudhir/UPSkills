@@ -1,15 +1,55 @@
 import React from 'react';
-import { FaPaintBrush, FaDesktop, FaDatabase, FaBriefcase, FaRobot, FaCamera, FaFilm } from 'react-icons/fa';
+import { FaPaintBrush, FaCode, FaDatabase, FaComments, FaLaptopCode, FaBriefcase, FaRobot } from 'react-icons/fa';
 
 const categories = [
-  { icon: <FaPaintBrush size={28} />, title: 'Design', color: 'bg-teal-100' },
-  { icon: <FaDesktop size={28} />, title: 'Development', color: 'bg-indigo-100' },
-  { icon: <FaDatabase size={28} />, title: 'Database', color: 'bg-blue-100' },
-  { icon: <FaBriefcase size={28} />, title: 'Business', color: 'bg-teal-100' },
-  { icon: <FaRobot size={28} />, title: 'Marketing', color: 'bg-orange-100' },
-  { icon: <FaCamera size={28} />, title: 'Photography', color: 'bg-rose-100' },
-  { icon: <FaFilm size={28} />, title: 'Acting', color: 'bg-gray-200' },
-  { icon: <FaBriefcase size={28} />, title: 'Business', color: 'bg-teal-100' },
+  { 
+    icon: <FaLaptopCode size={28} />, 
+    title: 'Frontend', 
+    color: 'bg-indigo-100',
+    description: 'Learn HTML, CSS, JavaScript, and modern frameworks like React to build beautiful user interfaces.'
+  },
+  { 
+    icon: <FaCode size={28} />, 
+    title: 'Backend', 
+    color: 'bg-blue-100',
+    description: 'Master server-side programming, APIs, databases, and authentication using Node, Express, and more.'
+  },
+  { 
+    icon: <FaPaintBrush size={28} />, 
+    title: 'Design', 
+    color: 'bg-teal-100',
+    description: 'Learn UI/UX principles, wireframing, prototyping, and visual design to create engaging interfaces.'
+  },
+  { 
+    icon: <FaCode size={28} />, 
+    title: 'Coding', 
+    color: 'bg-purple-100',
+    description: 'Sharpen your problem-solving and programming skills with algorithms, data structures, and logic.'
+  },
+  { 
+    icon: <FaComments size={28} />, 
+    title: 'Communication', 
+    color: 'bg-orange-100',
+    description: 'Improve soft skills, public speaking, and effective communication for professional growth.'
+  },
+  { 
+    icon: <FaDatabase size={28} />, 
+    title: 'Database', 
+    color: 'bg-green-100',
+    description: 'Understand relational and NoSQL databases, SQL queries, and data management strategies.'
+  },
+  { 
+    icon: <FaBriefcase size={28} />, 
+    title: 'Management', 
+    color: 'bg-teal-200',
+    description: 'Learn project management, team coordination, and leadership skills for real-world projects.'
+  },
+  { 
+    icon: <FaRobot size={28} />, 
+    title: 'Prompt Engineering', 
+    color: 'bg-gray-200',
+    description: 'Master AI prompt engineering, ChatGPT usage, and designing intelligent workflows with AI tools.'
+  },
 ];
 
 const Categories = () => {
@@ -30,7 +70,7 @@ const Categories = () => {
             </div>
             <h3 className="text-base sm:text-lg font-bold mb-2">{cat.title}</h3>
             <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.
+              {cat.description}
             </p>
           </div>
         ))}
