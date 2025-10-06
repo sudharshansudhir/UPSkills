@@ -30,8 +30,8 @@ import QuizPage from './pages/Quizpage.jsx'
 import QuizCreate from './pages/QuizCreate.jsx'
 import QuizResults from './pages/Quizresults.jsx'
 import CurrentCourse from './pages/CurrentCourse.jsx'
-import Forgot from './pages/Forgot.jsx'
-import ResetPassword from './pages/ResetPassword.jsx'
+// import Forgot from './pages/Forgot.jsx'
+// import ResetPassword from './pages/ResetPassword.jsx'
 import App from './App.jsx'
 import Contact from './pages/Contact.jsx';
 import Services from './pages/Services.jsx';
