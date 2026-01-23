@@ -14,7 +14,6 @@ const CourseChatbot = ({ course }) => {
 
     const userText = input;
 
-    // show user message immediately
     setMessages((prev) => [...prev, { role: "user", text: userText }]);
     setInput("");
     setLoading(true);
@@ -22,7 +21,6 @@ const CourseChatbot = ({ course }) => {
     try {
       const token = localStorage.getItem("token");
 
-      // ✅ CLEAN course context for AI
       const aiCourseContext = {
         title: course?.title,
         description: course?.description,
@@ -33,8 +31,8 @@ const CourseChatbot = ({ course }) => {
       const res = await axios.post(
         `${API_BASE}/api/ai/course-chat`,
         {
-          message: userText,        // ✅ correct key
-          course: aiCourseContext,  // ✅ clean context
+          message: userText,
+          course: aiCourseContext,
         },
         {
           headers: {
@@ -45,7 +43,7 @@ const CourseChatbot = ({ course }) => {
 
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: res.data.reply }, // ✅ correct response key
+        { role: "bot", text: res.data.reply },
       ]);
     } catch (err) {
       console.error("Chatbot error:", err);
@@ -60,29 +58,47 @@ const CourseChatbot = ({ course }) => {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Mentor Button */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 bg-[#2ec4b6] text-white px-4 py-3 rounded-full shadow-lg z-50"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 
+                   bg-[#2ec4b6] text-white px-5 py-3 rounded-full 
+                   shadow-xl z-50 text-sm sm:text-base"
       >
         🤖 Mentor
       </button>
 
       {/* Chat Window */}
       {open && (
-        <div className="fixed bottom-20 right-6 w-80 bg-white rounded-xl shadow-xl flex flex-col z-50">
-          <div className="bg-[#2ec4b6] text-white p-3 rounded-t-xl font-semibold">
-            AI Course Mentor
+        <div
+          className="
+            fixed z-50 bg-white flex flex-col shadow-2xl
+            bottom-0 right-0 left-0 h-[85vh]
+            sm:bottom-24 sm:right-6 sm:left-auto sm:h-auto
+            sm:w-96 sm:rounded-xl
+            rounded-t-2xl
+          "
+        >
+          {/* Header */}
+          <div className="bg-[#2ec4b6] text-white px-4 py-3 font-semibold flex justify-between items-center rounded-t-2xl sm:rounded-t-xl">
+            <span>AI Course Mentor</span>
+            <button
+              onClick={() => setOpen(false)}
+              className="text-white text-lg sm:hidden"
+            >
+              ✕
+            </button>
           </div>
 
-          <div className="p-3 h-64 overflow-y-auto space-y-2 text-sm">
+          {/* Messages */}
+          <div className="flex-1 p-3 overflow-y-auto space-y-3 text-sm bg-gray-50">
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`p-2 rounded ${
+                className={`max-w-[80%] px-3 py-2 rounded-lg leading-relaxed ${
                   m.role === "user"
-                    ? "bg-blue-100 text-right"
-                    : "bg-gray-100 text-left"
+                    ? "ml-auto bg-blue-500 text-white rounded-br-none"
+                    : "mr-auto bg-white text-gray-800 border rounded-bl-none"
                 }`}
               >
                 {m.text}
@@ -90,21 +106,28 @@ const CourseChatbot = ({ course }) => {
             ))}
 
             {loading && (
-              <div className="text-gray-400 text-sm">Thinking...</div>
+              <div className="text-gray-400 text-xs">AI is thinking…</div>
             )}
           </div>
 
-          <div className="flex border-t">
+          {/* Input */}
+          <div className="border-t p-2 flex gap-2 bg-white">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="flex-1 p-2 text-sm outline-none"
-              placeholder="Ask your doubt..."
               onKeyDown={(e) => e.key === "Enter" && askBot()}
+              className="
+                flex-1 px-3 py-2 text-sm outline-none
+                border rounded-lg focus:ring-2 focus:ring-[#2ec4b6]
+              "
+              placeholder="Ask your doubt..."
             />
             <button
               onClick={askBot}
-              className="bg-[#2ec4b6] text-white px-3"
+              className="
+                bg-[#2ec4b6] text-white px-4 py-2 rounded-lg
+                text-sm font-medium
+              "
             >
               Send
             </button>
