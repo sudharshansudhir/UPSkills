@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -24,3 +26,7 @@ dist-ssr
 *.sw?
 
 .env
+
+dummy.txt
+
+# git rm -r --cached Backend/UPSkills/node_modules

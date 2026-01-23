@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import CourseChatbot from "../components/CourseChatbot";
 
   const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -44,12 +45,15 @@ const CurrentCourse = () => {
         {/* Main Content */}
         <main className="flex-1 bg-white rounded-xl p-4 sm:p-6">
           <div className="mb-6">
-            {course.video ? (
+            {course.video ? (<>
               <video
                 controls
                 className="w-full h-48 sm:h-72 md:h-[400px] rounded-xl object-cover"
                 src={course.video}
               ></video>
+              <CourseChatbot course={course} />
+              </>
+
             ) : (
               <p>No video uploaded</p>
             )}

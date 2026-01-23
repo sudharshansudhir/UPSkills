@@ -1,12 +1,18 @@
 // server.js (only the parts you need to add/change)
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import aiRoutes from "./routes/aiRoutes.js";
+
+
 
 import authRoutes from "./routes/auth.js";
 import testRoutes from "./routes/testRoutes.js";
@@ -24,8 +30,8 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 
 
 
-dotenv.config();
-
+// dotenv.config();
+console.log("GEMINI KEY:", process.env.GEMINI_API_KEY);
 const app = express();
 
 // --- create uploads/videos if not exists
@@ -44,7 +50,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.use("/api/ai", aiRoutes);
 // serve uploaded files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // app.use("/api", adminRoutes);

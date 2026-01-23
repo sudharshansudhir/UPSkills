@@ -1,1 +1,10 @@
 .env
+node_modules
+
+uploads
+
+dummy
+
+dummy.txt
+
+git rm -r --cached Backend/UPSkills/uploads
